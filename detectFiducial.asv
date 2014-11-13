@@ -1,0 +1,3 @@
+function [pixelSize, fid1, fid2, fid3] = detectFiducial(img);
+
+curre

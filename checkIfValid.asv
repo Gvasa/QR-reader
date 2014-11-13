@@ -1,8 +1,0 @@
-function[action] = checkIfValid(col, row)
-
-if(col < 9 && row < 9)
-    action = false;
-else if (col 
-        
-        
-    end

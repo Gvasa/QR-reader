@@ -7,6 +7,8 @@ function [strout] = tnm034(img)
 %   
 %   binary4 = fliplr([0 1 1 0 0 1 1 1]);
 
+detectFiducial(img);
+
 binMat = zeros(183, 8);
 
 RowCounter = 1;
@@ -26,13 +28,17 @@ for col = 1 : 41
         end
    end
 end
-RowCounter
+RowCounter-1;
 assignin('base', 'binMat', binMat);
+
+charMat = zeros(1, RowCounter);
+
+
 for i = 1:183
-    char(bi2de(fliplr(binMat(i, :))))
+    charMat(1,i) = char(bi2de(fliplr(binMat(i, :))));
 end
 
-
+char(charMat)
 
 % char(bi2de(binary1))
 % char(bi2de(binary2))
