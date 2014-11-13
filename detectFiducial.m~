@@ -81,11 +81,10 @@ for i = 1 : 41
                     blackCounter = blackCounter+1;
                     if(blackCounter == ratio)
                         disp('Klar - b?rja om');
-                        %img(i,startPos) = 1;
-                        %img(i,j) = 1;
                         c = c+1;
                         j = startPos + 1;
                         state = 0;
+                        i
                     end
                 else
                     disp('Fel, b?rja om - case 5');
@@ -103,7 +102,6 @@ for i = 1 : 41
     j=1;
 end
 
-imshow(img);
 c
 
 
