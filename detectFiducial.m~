@@ -42,7 +42,7 @@ for i = 1 : 41
                 if(img(i,j) == 1)
                     disp('Vit - case 2'); 
                     whiteCounter = whiteCounter+1;
-                    if(whiteCounter == ratio)
+                    if(whiteCounter > 0.5*ratio && whiteCounter < 1.5*ratio)
                         disp('Vidare till svart - case 2');
                         state = 3;
                         whiteCounter = 0;
@@ -57,7 +57,7 @@ for i = 1 : 41
                 if(img(i,j) == 0)
                     disp('Svart - case 3');
                     blackCounter = blackCounter + 1;
-                    if(blackCounter == ratio*3)
+                    if(blackCounter > 1.5*ratio && blackCounter < 4.5*ratio)
                         disp('Vidare till vit - case 3');
                         state = 4;
                         blackCounter = 0;
@@ -71,7 +71,7 @@ for i = 1 : 41
                 if(img(i,j) == 1)
                     disp('VIT - case 4');
                     whiteCounter = whiteCounter+1;
-                    if(whiteCounter == ratio)
+                    if(whiteCounter > 0.5*ratio && whiteCounter < 1.5*ratio)
                         disp('Vidare till svart - case 4');
                         state = 5;
                         whiteCounter = 0;
@@ -143,7 +143,7 @@ for j = 1 : 41
                 if(img(i,j) == 1)
                     disp('Vit - case 2'); 
                     whiteCounter = whiteCounter+1;
-                    if(whiteCounter == ratio)
+                    if(whiteCounter > 0.5*ratio && whiteCounter <)
                         disp('Vidare till svart - case 2');
                         state = 3;
                         whiteCounter = 0;
@@ -216,19 +216,21 @@ for j = 1 : 41
     i=1;
 end
 
-% figure,imshow(img)
-% hold on
-% for i=1:(counterCoordsX-1)
-%     plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
-% end
-% hold on
-% 
-% for i=1:11
-%     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
-% end
-
 coordsX
 coordsX = sortrows(coordsX,1)
+figure,imshow(img)
+hold on
+for i=1:(11)
+    plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
+end
+hold on
+
+coordsY
+for i=1:11
+    plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
+end
+
+
 
 
 

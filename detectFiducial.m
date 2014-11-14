@@ -6,6 +6,9 @@ state = 0;
 whiteCounter = 0;
 blackCounter = 0;
 
+lowerRate = 0.7;
+upperRate = 1.3;
+
 coordsX = zeros(11,4);
 coordsY = zeros(11,4);
 
@@ -13,7 +16,6 @@ counterCoordsX = 1;
 counterCoordsY = 1;
 
 j=1;
-c = 0;
 
 for i = 1 : 41
     while(j<42)
@@ -42,7 +44,7 @@ for i = 1 : 41
                 if(img(i,j) == 1)
                     disp('Vit - case 2'); 
                     whiteCounter = whiteCounter+1;
-                    if(whiteCounter == ratio)
+                    if(whiteCounter >= lowerRate*ratio && upperRate <= 1.5*ratio)
                         disp('Vidare till svart - case 2');
                         state = 3;
                         whiteCounter = 0;
@@ -57,7 +59,7 @@ for i = 1 : 41
                 if(img(i,j) == 0)
                     disp('Svart - case 3');
                     blackCounter = blackCounter + 1;
-                    if(blackCounter == ratio*3)
+                    if(blackCounter >= lowerRate*3*ratio && blackCounter <= upperRate*3*ratio)
                         disp('Vidare till vit - case 3');
                         state = 4;
                         blackCounter = 0;
@@ -71,7 +73,7 @@ for i = 1 : 41
                 if(img(i,j) == 1)
                     disp('VIT - case 4');
                     whiteCounter = whiteCounter+1;
-                    if(whiteCounter == ratio)
+                    if(whiteCounter >= lowerRate*ratio && whiteCounter <= upperRate*ratio)
                         disp('Vidare till svart - case 4');
                         state = 5;
                         whiteCounter = 0;
@@ -85,7 +87,7 @@ for i = 1 : 41
                 if(img(i,j) == 0)
                     disp('Svart!');
                     blackCounter = blackCounter+1;
-                    if(blackCounter == ratio)
+                    if(blackCounter >= lowerRate*ratio && blackCounter <= upperRate*ratio)
                         disp('Klar - b?rja om');
                         %img(i,startPos) = 1;
                         %img(i,j) = 1;
@@ -143,7 +145,7 @@ for j = 1 : 41
                 if(img(i,j) == 1)
                     disp('Vit - case 2'); 
                     whiteCounter = whiteCounter+1;
-                    if(whiteCounter == ratio)
+                    if(whiteCounter >= lowerRate*ratio && whiteCounter <= upperRate*ratio)
                         disp('Vidare till svart - case 2');
                         state = 3;
                         whiteCounter = 0;
@@ -158,7 +160,7 @@ for j = 1 : 41
                 if(img(i,j) == 0)
                     disp('Svart - case 3');
                     blackCounter = blackCounter + 1;
-                    if(blackCounter == ratio*3)
+                    if(blackCounter >= lowerRate*3*ratio && blackCounter <= upperRate*3*ratio)
                         disp('Vidare till vit - case 3');
                         state = 4;
                         blackCounter = 0;
@@ -172,7 +174,7 @@ for j = 1 : 41
                 if(img(i,j) == 1)
                     disp('VIT - case 4');
                     whiteCounter = whiteCounter+1;
-                    if(whiteCounter == ratio)
+                    if(whiteCounter >= lowerRate*ratio && whiteCounter <= upperRate*ratio)
                         disp('Vidare till svart - case 4');
                         state = 5;
                         whiteCounter = 0;
@@ -186,7 +188,7 @@ for j = 1 : 41
                 if(img(i,j) == 0)
                     disp('Svart!');
                     blackCounter = blackCounter+1;
-                    if(blackCounter == ratio)
+                    if(blackCounter >= lowerRate*ratio && blackCounter <= upperRate*3*ratio)
                         disp('Klar - b?rja om');
                         %img(i,startPos) = 1;
                         %img(i,j) = 1;
@@ -225,6 +227,8 @@ for i=1:(11)
 end
 hold on
 
+coordsY
+counter
 for i=1:11
     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
 end
