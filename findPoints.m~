@@ -167,7 +167,7 @@ for i=1:sizeY
     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
 end
 hold on;
-plot([finalNWY,finalSWY,finalNEY,finalNWY],[finalNWX,finalSWX,finalNEX,finalNWX],'Color','g','LineWidth',1);
+plot([finalNWY,finalSWY,finalNEY],[coordsX(i,2),coordsX(i,4)],'Color','b','LineWidth',1);
 plot(finalNWY, finalNWX, 'g*');
 plot(finalSWY, finalSWX, 'g*');
 plot(finalNEY, finalNEX, 'g*');

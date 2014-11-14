@@ -235,27 +235,8 @@ end
 
 coordsX = coordsX(1:counterCoordsX,:);
 coordsY = coordsY(1:counterCoordsY,:);
-%coordsX = sortrows(coordsX,1)
-figure,imshow(img)
-hold on
-for i=1:(counterCoordsX)
-    plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
-end
-hold on
+coordsX = sortrows(coordsX,1);
+coordsY = sortrows(coordsY,1);
 
-%coordsY = sortrows(coordsY,1)
-for i=1:counterCoordsY
-    plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
-end
-
-
-
-
-
-    
-    %1. hitta 0 
-    %2. kolla hur m?nga 0
-    %3. hitta 1
-    %4. lika m?nga 1
-    
+findPoints(img, coordsX, coordsY);
     

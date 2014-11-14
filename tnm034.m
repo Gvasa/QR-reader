@@ -1,5 +1,7 @@
 function [strout] = tnm034(img)
 
+close all;
+
 detectFiducial(img);
 
 binMat = zeros(183, 8);
