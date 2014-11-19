@@ -1,4 +1,4 @@
-function [pixelSize, fid1, fid2, fid3] = detectFiducial(img)
+function [coordsX, coordsY] = detectFiducial(img)
 
 startPos = 0;
 ratio = 0;
@@ -6,12 +6,12 @@ state = 0;
 whiteCounter = 0;
 blackCounter = 0;
 
-upperRate = 1.1;
-lowerRate = 0.9;
+upperRate = 1.3;
+lowerRate = 0.7;
 
 
-coordsX = zeros(10000,4);
-coordsY = zeros(10000,4);
+coordsX = zeros(100000,4);
+coordsY = zeros(100000,4);
 
 counterCoordsX = 1;
 counterCoordsY = 1;
@@ -233,10 +233,32 @@ for j = 1 : colSize
     i=1;
 end
 
+figure;
+% -------------------------- PLOT SHIT
+imshow(img);
+hold on;
+
+
 coordsX = coordsX(1:counterCoordsX,:);
 coordsY = coordsY(1:counterCoordsY,:);
 coordsX = sortrows(coordsX,1);
 coordsY = sortrows(coordsY,1);
 
-findPoints(img, coordsX, coordsY);
+[sizeX ~] = size(coordsX);
+[sizeY ~] = size(coordsY);
+
+for i=1:(sizeX)
+    plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
+end
+hold on
+
+for i=1:sizeY
+    plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
+end
+disp('Fid');
+pause;
+
+
+
+
     

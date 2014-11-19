@@ -1,4 +1,4 @@
-function[pointMatrix] = findPoints(img, coordsX, coordsY)
+function[centroidMatrix, minmaxMatrix, fidNWwidth, fidNEwidth, distanceBetweenFid] = findPoints(img, coordsX, coordsY)
 
 pointMatrix = 0;
 [sizeX ~] = size(coordsX);
@@ -13,7 +13,7 @@ end
 
 % Flaggar linjer som har grannar men f?
 for i = 1:sizeX-1
-    if(sum(ismember(coordsX(:,1),coordsX(i,1), 'rows')) < 3)
+    if(sum(ismember(coordsX(:,1),coordsX(i,1), 'rows')) < 15)
         mask = (1-ismember(coordsX(:,1),coordsX(i,1), 'rows'));
         mask = [mask, mask, mask, mask];
         coordsX = coordsX.*mask;
@@ -29,7 +29,7 @@ end
 
 % Flaggar linjer som har grannar men f?
 for i = 1:sizeY-1
-    if(sum(ismember(coordsY(:,2),coordsY(i,2), 'rows')) < 3)
+    if(sum(ismember(coordsY(:,2),coordsY(i,2), 'rows')) < 15)
         mask = (1-ismember(coordsY(:,2),coordsY(i,2), 'rows'));
         mask = [mask, mask, mask, mask];
         coordsY = coordsY.*mask;
@@ -72,6 +72,8 @@ minY = min(coordsY(:,4));
 maxX = max(coordsX(:,1));
 maxY = max(coordsX(:,2));
 
+minmaxMatrix = [minX maxX minY maxY];
+
 medelX = (maxX - minX)/2 + minX;
 medelY = (maxY - minY)/2 + minY;
 
@@ -92,8 +94,11 @@ NWMy = NWMYy.*NWMXy;
 NWMy = [NWMy NWMy NWMy NWMy];
 
 NWy = coordsY.*NWMy;
-NWy(ismember(NWy,[0 0 0 0], 'rows'), :) = []
+NWy(ismember(NWy,[0 0 0 0], 'rows'), :) = [];
 finalNWY = floor(mean(NWy(:,1)));
+
+
+
 
 % ---------------------- SW
 SWMYx = (coordsX(:,2) > medelY);
@@ -111,7 +116,7 @@ SWMy = SWMYy.*SWMXy;
 SWMy = [SWMy SWMy SWMy SWMy];
 
 SWy = coordsY.*SWMy;
-SWy(ismember(SWy,[0 0 0 0], 'rows'), :) = []
+SWy(ismember(SWy,[0 0 0 0], 'rows'), :) = [];
 finalSWY = floor(mean(SWy(:,1)));
 
 % ------------------------- NE
@@ -131,7 +136,7 @@ NEMy = NEMYy.*NEMXy;
 NEMy = [NEMy NEMy NEMy NEMy];
 
 NEy = coordsY.*NEMy;
-NEy(ismember(NEy,[0 0 0 0], 'rows'), :) = []
+NEy(ismember(NEy,[0 0 0 0], 'rows'), :) = [];
 finalNEY = floor(mean(NEy(:,1)));
 
 % ------------------------ SE
@@ -151,24 +156,80 @@ SEMy = SEMYy.*SEMXy;
 SEMy = [SEMy SEMy SEMy SEMy];
 
 SEy = coordsY.*SEMy;
-SEy(ismember(SEy,[0 0 0 0], 'rows'), :) = []
+SEy(ismember(SEy,[0 0 0 0], 'rows'), :) = [];
 finalSEY = floor(mean(SEy(:,1)));
 
-% -------------------------- PLOT SHIT
-
-figure,imshow(img)
-hold on;
-for i=1:(sizeX)
-    plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
-end
-hold on
-
-for i=1:sizeY
-    plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
-end
+figure;
+imshow(img);
 hold on;
 plot([finalNWY,finalSWY,finalNEY,finalNWY],[finalNWX,finalSWX,finalNEX,finalNWX],'Color','g','LineWidth',1);
 plot(finalNWY, finalNWX, 'g*');
 plot(finalSWY, finalSWX, 'g*');
 plot(finalNEY, finalNEX, 'g*');
 plot(finalSEY, finalSEX, 'g*');
+
+%Find points with labeling and centorids
+iLabel = logical(img);
+stat = regionprops(iLabel, 'centroid');
+centroids = cat(1,stat.Centroid);
+plot(centroids(:,1),centroids(:,2), 'r*');
+
+%Para ihop och finn de som ?r lika
+[sizeCentroids ~] = size(centroids);
+minDistNW = 1000;
+minDistNE = 1000;
+minDistSW = 1000;
+minDistSE = 1000;
+centroidsMatrix = zeros(4,2);
+
+for i = 1:sizeCentroids
+    if(norm([centroids(i,1) centroids(i,2)] - [finalNWY finalNWX]) < minDistNW)
+        minDistNW = norm([centroids(i,1) centroids(i,2)] - [finalNWY finalNWX]);
+        centroidMatrix(1,1) = centroids(i,1);
+        centroidMatrix(1,2) = centroids(i,2);
+        
+    end
+    if(norm([centroids(i,1) centroids(i,2)] - [finalNEY finalNEX]) < minDistNE)
+        minDistNE = norm([centroids(i,1) centroids(i,2)] - [finalNEY finalNEX]);
+        centroidMatrix(2,1) = centroids(i,1);
+        centroidMatrix(2,2) = centroids(i,2);
+    end
+    if(norm([centroids(i,1) centroids(i,2)] - [finalSWY finalSWX]) < minDistSW)
+        minDistSW = norm([centroids(i,1) centroids(i,2)] - [finalSWY finalSWX]);
+        centroidMatrix(3,1) = centroids(i,1);
+        centroidMatrix(3,2) = centroids(i,2);
+    end
+    if(norm([centroids(i,1) centroids(i,2)] - [finalSEY finalSEX]) < minDistSE)
+        minDistSE = norm([centroids(i,1) centroids(i,2)] - [finalSEY finalSEX]);
+        centroidMatrix(4,1) = centroids(i,1);
+        centroidMatrix(4,2) = centroids(i,2);
+    end
+    
+end
+
+% LEta i xcoords efter final-yv?rden f?r att f? ut linjer ...
+fidNWwidthMask = coordsX(:,2) == finalNWX;
+fidNWwidthMask = [fidNWwidthMask fidNWwidthMask fidNWwidthMask fidNWwidthMask];
+fidNWwidthMask = fidNWwidthMask.*coordsX;
+fidNWwidthMask(ismember(fidNWwidthMask,[0 0 0 0], 'rows'), :) = []
+
+fidNEwidthMask = coordsX(:,2) == finalNEX;
+fidNEwidthMask = [fidNEwidthMask fidNEwidthMask fidNEwidthMask fidNEwidthMask];
+fidNEwidthMask = fidNEwidthMask.*coordsX;
+fidNEwidthMask(ismember(fidNEwidthMask,[0 0 0 0], 'rows'), :) = []
+
+fidNWwidth = max(fidNWwidthMask(:,1) - fidNWwidthMask(:,3));
+fidNEwidth = max(fidNEwidthMask(:,1) - fidNEwidthMask(:,3));
+distanceBetweenFid = finalNEY(1) - finalNWY(1);
+
+plot([finalNWY,centroidMatrix(1,1)],[finalNWX,centroidMatrix(1,2)],'Color','r','LineWidth',1);
+plot([finalNEY,centroidMatrix(2,1)],[finalNEX,centroidMatrix(2,2)],'Color','r','LineWidth',1);
+plot([finalSWY,centroidMatrix(3,1)],[finalSWX,centroidMatrix(3,2)],'Color','r','LineWidth',1);
+plot([finalSEY,centroidMatrix(4,1)],[finalSEX,centroidMatrix(4,2)],'Color','r','LineWidth',1);
+
+
+pointMatrix = [finalNWY, finalNWX; finalNEY, finalNEX; finalSWY, finalSWX; finalSEY, finalSEX];
+
+pause;
+
+
