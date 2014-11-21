@@ -1,16 +1,22 @@
-function [newImg,pointNW] = transformPicture(centroidMatrix, minmaxMatrix, img)
+function [newImg,pointNW, pixelSize] = transformPicture(centroidMatrix, minmaxMatrix, img)
 
 pointNW = [centroidMatrix(1,1) centroidMatrix(1,2)];
 pointNE = [centroidMatrix(2,1) centroidMatrix(2,2)];
 pointSW = [centroidMatrix(3,1) centroidMatrix(3,2)];
 pointSE = [centroidMatrix(4,1) centroidMatrix(4,2)];
 
-wantedPointNW = pointNW;
-wantedPointNE = [(round(norm(pointNE - pointNW)) + pointNW(1)), pointNW(2)];
-wantedPointSW = [pointNW(1), (round(norm(pointSW - pointNW)) + pointNW(2))];
+NWtoNE = round(norm(pointNE - pointNW));
 
-transformMatrix = [wantedPointNW 1; wantedPointNE 1; wantedPointSW 1];
-centroidMatrixTemp = [centroidMatrix(1:3, :) ones(3,1)];
+wantedPointNW = pointNW;
+wantedPointNE = [(NWtoNE + pointNW(1)), pointNW(2)];
+wantedPointSW = [pointNW(1), (NWtoNE + pointNW(2))];
+
+pixelSize = NWtoNE/33;
+
+wantedPointSE = [wantedPointNE(1)-pixelSize*3, wantedPointSW(2)-pixelSize*3];
+
+transformMatrix = [wantedPointNW 1; wantedPointNE 1; wantedPointSW 1; wantedPointSE 1];
+centroidMatrixTemp = [centroidMatrix(1:4, :) ones(4,1)];
 
 tM = transformMatrix\centroidMatrixTemp;
 
@@ -52,11 +58,14 @@ plot([transformMatrix(:,1); transformMatrix(1,1)],[transformMatrix(:,2); transfo
 plot(transformMatrix(1,1), transformMatrix(1,2), 'c*');
 plot(transformMatrix(2,1), transformMatrix(2,2), 'c*');
 plot(transformMatrix(3,1), transformMatrix(3,2), 'c*');
+plot(transformMatrix(4,1), transformMatrix(4,2), 'c*');
+
 
 plot([centroidMatrix(1:3,1); centroidMatrix(1,1)],[centroidMatrix(1:3,2); centroidMatrix(1,2)],'Color','g','LineWidth',1);
 plot(centroidMatrix(1,1), centroidMatrix(1,2), 'g*');
 plot(centroidMatrix(2,1), centroidMatrix(2,2), 'g*');
 plot(centroidMatrix(3,1), centroidMatrix(3,2), 'g*');
 plot(centroidMatrix(4,1), centroidMatrix(4,2), 'g*');
+
 
 pause;

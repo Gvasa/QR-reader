@@ -207,7 +207,7 @@ for i = 1:sizeCentroids
     
 end
 
-% LEta i xcoords efter final-yv?rden f?r att f? ut linjer ...
+% Leta i xcoords efter final-yv?rden f?r att f? ut linjer ...
 fidNWwidthMask = coordsX(:,2) == finalNWX;
 fidNWwidthMask = [fidNWwidthMask fidNWwidthMask fidNWwidthMask fidNWwidthMask];
 fidNWwidthMask = fidNWwidthMask.*coordsX;
