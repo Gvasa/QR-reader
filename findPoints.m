@@ -1,6 +1,6 @@
-function[centroidMatrix, minmaxMatrix, fidNWwidth, fidNEwidth, distanceBetweenFid] = findPoints(img, coordsX, coordsY)
+function[centroidMatrix] = findPoints(img, coordsX, coordsY)
 
-pointMatrix = 0;
+% Finna storleken p? coordsX och Y
 [sizeX ~] = size(coordsX);
 [sizeY ~] = size(coordsY);
 
@@ -47,7 +47,7 @@ coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 coordsX = [coordsX zeros(sizeX,1)];
 coordsY = [coordsY zeros(sizeY,1)];
 
-% Tar bort dom som inte sk?r varandra
+% Flaggar dom som ite sk?r varandra
 for x = 1:sizeX
     for y = 1:sizeY
         if(coordsX(x,2) >= coordsY(y,4) && coordsX(x,2) <= coordsY(y,2) && coordsY(y,1) >= coordsX(x,3) && coordsY(y,1) <= coordsX(x,1))
@@ -57,6 +57,7 @@ for x = 1:sizeX
     end
 end
 
+% Tar bort alla flaggade sk?rningarna
 coordsX(ismember(coordsX(:,5),0, 'rows'), :) = [];
 coordsY(ismember(coordsY(:,5),0, 'rows'), :) = [];
 coordsX(:,5) = [];
@@ -66,17 +67,13 @@ coordsY(:,5) = [];
 [sizeY ~] = size(coordsY);
 
 % H?r finner vi mittpunkter! :D
-
 minX = min(coordsX(:,3));
 minY = min(coordsY(:,4));
 maxX = max(coordsX(:,1));
 maxY = max(coordsX(:,2));
 
-minmaxMatrix = [minX maxX minY maxY];
-
 medelX = (maxX - minX)/2 + minX;
 medelY = (maxY - minY)/2 + minY;
-
 
 % NW
 NWMYx = (coordsX(:,2) < medelY);
@@ -96,9 +93,6 @@ NWMy = [NWMy NWMy NWMy NWMy];
 NWy = coordsY.*NWMy;
 NWy(ismember(NWy,[0 0 0 0], 'rows'), :) = [];
 finalNWY = floor(mean(NWy(:,1)));
-
-
-
 
 % ---------------------- SW
 SWMYx = (coordsX(:,2) > medelY);
@@ -140,7 +134,6 @@ NEy(ismember(NEy,[0 0 0 0], 'rows'), :) = [];
 finalNEY = floor(mean(NEy(:,1)));
 
 % ------------------------ SE
-
 SEMYx = (coordsX(:,2) > medelY);
 SEMXx = (coordsX(:,1) > medelX);
 SEMx = SEMYx.*SEMXx;
@@ -159,6 +152,7 @@ SEy = coordsY.*SEMy;
 SEy(ismember(SEy,[0 0 0 0], 'rows'), :) = [];
 finalSEY = floor(mean(SEy(:,1)));
 
+%Rita ut v?ra punkter
 figure;
 imshow(img);
 hold on;
@@ -206,30 +200,6 @@ for i = 1:sizeCentroids
     end
     
 end
-
-% Leta i xcoords efter final-yv?rden f?r att f? ut linjer ...
-fidNWwidthMask = coordsX(:,2) == finalNWX;
-fidNWwidthMask = [fidNWwidthMask fidNWwidthMask fidNWwidthMask fidNWwidthMask];
-fidNWwidthMask = fidNWwidthMask.*coordsX;
-fidNWwidthMask(ismember(fidNWwidthMask,[0 0 0 0], 'rows'), :) = []
-
-fidNEwidthMask = coordsX(:,2) == finalNEX;
-fidNEwidthMask = [fidNEwidthMask fidNEwidthMask fidNEwidthMask fidNEwidthMask];
-fidNEwidthMask = fidNEwidthMask.*coordsX;
-fidNEwidthMask(ismember(fidNEwidthMask,[0 0 0 0], 'rows'), :) = []
-
-fidNWwidth = max(fidNWwidthMask(:,1) - fidNWwidthMask(:,3));
-fidNEwidth = max(fidNEwidthMask(:,1) - fidNEwidthMask(:,3));
-distanceBetweenFid = finalNEY(1) - finalNWY(1);
-
-plot([finalNWY,centroidMatrix(1,1)],[finalNWX,centroidMatrix(1,2)],'Color','r','LineWidth',1);
-plot([finalNEY,centroidMatrix(2,1)],[finalNEX,centroidMatrix(2,2)],'Color','r','LineWidth',1);
-plot([finalSWY,centroidMatrix(3,1)],[finalSWX,centroidMatrix(3,2)],'Color','r','LineWidth',1);
-plot([finalSEY,centroidMatrix(4,1)],[finalSEX,centroidMatrix(4,2)],'Color','r','LineWidth',1);
-
-
-pointMatrix = [finalNWY, finalNWX; finalNEY, finalNEX; finalSWY, finalSWX; finalSEY, finalSEX];
-
 pause;
 
 

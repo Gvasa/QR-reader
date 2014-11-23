@@ -9,7 +9,6 @@ blackCounter = 0;
 upperRate = 1.3;
 lowerRate = 0.7;
 
-
 coordsX = zeros(100000,4);
 coordsY = zeros(100000,4);
 
@@ -238,7 +237,6 @@ figure;
 imshow(img);
 hold on;
 
-
 coordsX = coordsX(1:counterCoordsX,:);
 coordsY = coordsY(1:counterCoordsY,:);
 coordsX = sortrows(coordsX,1);
@@ -255,7 +253,6 @@ hold on
 for i=1:sizeY
     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
 end
-disp('Fid');
 pause;
 
 

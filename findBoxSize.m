@@ -1,7 +1,14 @@
-function[boxSize] = findBoxSize(fidNWwidth, fidNEwidth, distanceBetweenFid)
+function[boxSize] = findBoxSize(centroidMatrix)% Punkterna
 
-boxSize1 = distanceBetweenFid/34
-boxSize2 = fidNWwidth/6.5
-boxSize3 = fidNEwidth/6.5
+% Punkterna
+pointNW = [centroidMatrix(1,1) centroidMatrix(1,2)];
+pointNE = [centroidMatrix(2,1) centroidMatrix(2,2)];
+pointSW = [centroidMatrix(3,1) centroidMatrix(3,2)];
+pointSE = [centroidMatrix(4,1) centroidMatrix(4,2)];
 
-boxSize = (boxSize1 + boxSize2 + boxSize3)/3;
+% Ta ut l?ngden mellan de olika fid
+NWtoNE = (norm(pointNW - pointNE));
+NWtoSW = (norm(pointNW - pointSW));
+
+% R?kna ut pixelstorleken
+boxSize = min([NWtoNE NWtoSW]) / 34;
