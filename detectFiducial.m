@@ -6,8 +6,8 @@ state = 0;
 whiteCounter = 0;
 blackCounter = 0;
 
-upperRate = 1.3;
-lowerRate = 0.7;
+upperRate = 1.6;
+lowerRate = 0.4;
 
 coordsX = zeros(100000,4);
 coordsY = zeros(100000,4);
@@ -28,15 +28,13 @@ for i = 1 : rowSize
     while(j<=colSize)
         switch state
             case 0
-                if(img(i,j) == 0)
-                    %disp('Svart - case 0');
+                if(img(i,j) == 1 && img(i,j+1) == 0)
                     startPos = j;
                     state = 1;
                     ratio = 1;
                     whiteCounter = 0;
                     blackCounter = 0;
                 end
-                
             case 1
                 if(img(i,j) == 0)
                     %disp('Svart - case 1');
@@ -44,7 +42,6 @@ for i = 1 : rowSize
                 else
                     %disp('Vidare till vit - Case 1');
                     state = 2;
-                    j = j-1;
                 end
                 
             case 2
@@ -52,7 +49,7 @@ for i = 1 : rowSize
                 if(img(i,j) == 1)
                     %disp('Vit - case 2'); 
                     whiteCounter = whiteCounter+1;
-                    if(whiteCounter >= lowerRate*ratio && upperRate <= 1.5*ratio && nextPixel == 0)
+                    if(whiteCounter >= lowerRate*ratio && whiteCounter <= upperRate*ratio && nextPixel == 0)
                         %disp('Vidare till svart - case 2');
                         state = 3;
                         whiteCounter = 0;
@@ -60,7 +57,7 @@ for i = 1 : rowSize
                 else
                     %disp('Tillbaka fr?n b?rjan - case 2');
                     state = 0;
-                    j = startPos + 1;
+                    j = startPos;
                 end
                 
             case 3
@@ -76,7 +73,7 @@ for i = 1 : rowSize
                 else
                     %disp('Tillbaka till start - case 3');
                     state = 0;
-                    j = startPos + 1;
+                    j = startPos;
                 end
             case 4
                 nextPixel = img(i,j+1);
@@ -91,14 +88,14 @@ for i = 1 : rowSize
                 else
                     %disp('Fel, b?rja om - case 4');
                     state = 0;
-                    j = startPos + 1;
+                    j = startPos;
                 end
             case 5
                 nextPixel = img(i,j+1);
                 if(img(i,j) == 0)
                     %disp('Svart!');
                     blackCounter = blackCounter+1;
-                    if(blackCounter >= lowerRate*ratio && blackCounter <= upperRate*ratio)
+                    if(blackCounter >= lowerRate*ratio && blackCounter <= upperRate*ratio && nextPixel == 1)
                         %disp('Klar - b?rja om');
                         
                         coordsX(counterCoordsX, 1) = j;
@@ -108,16 +105,16 @@ for i = 1 : rowSize
                     
                         counterCoordsX = counterCoordsX +1;
 
-                        j = startPos + 1;
+                        j = startPos;
                         state = 0;
                     end
                 else
                     %disp('Fel, b?rja om - case 5');
                     state = 0;
-                    j = startPos + 1;
+                    j = startPos;
                 end
             otherwise
-                %disp('n?nting gick fel');
+                disp('n?nting gick fel');
                 state = 0;
         end
         j = j+1;
@@ -127,12 +124,20 @@ for i = 1 : rowSize
 end
 
 nextPixel = 0;
+state = 0;
+i = 1;
 
 for j = 1 : colSize
     while(i<=rowSize)
+%         if(j == 101 && i > 512 & i < 600)
+%             plot(j,i, 'r*');
+%             state
+%             pause;
+%         end
+        
         switch state
             case 0
-                if(img(i,j) == 0)
+                if(img(i,j) == 1 && img(i+1,j) == 0)
                     %disp('Svart - case 0');
                     startPos = i;
                     state = 1;
@@ -140,7 +145,6 @@ for j = 1 : colSize
                     whiteCounter = 0;
                     blackCounter = 0;
                 end
-                
             case 1
                 if(img(i,j) == 0)
                     %disp('Svart - case 1');
@@ -150,7 +154,6 @@ for j = 1 : colSize
                     state = 2;
                     i = i-1;
                 end
-                
             case 2
                 nextPixel = img(i+1,j);
                 if(img(i,j) == 1)
@@ -164,7 +167,7 @@ for j = 1 : colSize
                 else
                     %disp('Tillbaka fr?n b?rjan - case 2');
                     state = 0;
-                    i = startPos + 1;
+                    i = startPos;
                 end
                 
             case 3
@@ -180,7 +183,7 @@ for j = 1 : colSize
                 else
                     %disp('Tillbaka till start - case 3');
                     state = 0;
-                    i = startPos + 1;
+                    i = startPos;
                 end
             case 4
                 nextPixel = img(i+1,j);
@@ -195,17 +198,15 @@ for j = 1 : colSize
                 else
                     %disp('Fel, b?rja om - case 4');
                     state = 0;
-                    i = startPos + 1;
+                    i = startPos;
                 end
             case 5
                 nextPixel = img(i+1,j);
                 if(img(i,j) == 0)
                     %disp('Svart!');
                     blackCounter = blackCounter+1;
-                    if(blackCounter >= lowerRate*ratio && blackCounter <= upperRate*ratio)
+                    if(blackCounter >= lowerRate*ratio && blackCounter <= upperRate*ratio && nextPixel == 1)
                         %disp('Klar - b?rja om');
-                        %img(i,startPos) = 1;
-                        %img(i,j) = 1;
                         
                         coordsY(counterCoordsY, 1) = j;
                         coordsY(counterCoordsY, 2) = i;
@@ -214,13 +215,13 @@ for j = 1 : colSize
                     
                         counterCoordsY = counterCoordsY +1;
 
-                        i = startPos + 1;
+                        i = startPos;
                         state = 0;
                     end
                 else
                     %disp('Fel, b?rja om - case 5');
                     state = 0;
-                    i = startPos + 1;
+                    i = startPos;
                 end
             otherwise
                 %disp('n?nting gick fel');
@@ -242,15 +243,12 @@ coordsY = coordsY(1:counterCoordsY,:);
 coordsX = sortrows(coordsX,1);
 coordsY = sortrows(coordsY,1);
 
-[sizeX ~] = size(coordsX);
-[sizeY ~] = size(coordsY);
-
-for i=1:(sizeX)
+for i=1:counterCoordsX
     plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
 end
 hold on
 
-for i=1:sizeY
+for i=1:counterCoordsY
     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
 end
 pause;

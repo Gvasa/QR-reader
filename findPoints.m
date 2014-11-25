@@ -1,19 +1,21 @@
 function[centroidMatrix] = findPoints(img, coordsX, coordsY)
 
+granne = 15;
+antalgrannar = 15;
+
 % Finna storleken p? coordsX och Y
 [sizeX ~] = size(coordsX);
 [sizeY ~] = size(coordsY);
 
 % Tar bort linjer som inte har n?gra n?ra grannar
 for i = 1:sizeX-1
-    if((coordsX(i+1,2) - coordsX(i,2)) > 5)
+    if((coordsX(i+1,2) - coordsX(i,2)) > granne)
         coordsX(i,:) = [0, 0, 0 ,0];
     end
 end
-
 % Flaggar linjer som har grannar men f?
 for i = 1:sizeX-1
-    if(sum(ismember(coordsX(:,1),coordsX(i,1), 'rows')) < 15)
+    if(sum(ismember(coordsX(:,1),coordsX(i,1), 'rows')) < antalgrannar)
         mask = (1-ismember(coordsX(:,1),coordsX(i,1), 'rows'));
         mask = [mask, mask, mask, mask];
         coordsX = coordsX.*mask;
@@ -22,14 +24,14 @@ end
 
 % Tar bort linjer som inte har n?gra n?ra grannar
 for i = 1:sizeY-1
-    if((coordsY(i+1,1) - coordsY(i,1)) > 5)
+    if((coordsY(i+1,1) - coordsY(i,1)) > granne)
         coordsY(i,:) = [0, 0, 0 ,0];
     end
 end
 
 % Flaggar linjer som har grannar men f?
 for i = 1:sizeY-1
-    if(sum(ismember(coordsY(:,2),coordsY(i,2), 'rows')) < 15)
+    if(sum(ismember(coordsY(:,2),coordsY(i,2), 'rows')) < antalgrannar)
         mask = (1-ismember(coordsY(:,2),coordsY(i,2), 'rows'));
         mask = [mask, mask, mask, mask];
         coordsY = coordsY.*mask;
@@ -65,15 +67,32 @@ coordsY(:,5) = [];
 
 [sizeX ~] = size(coordsX);
 [sizeY ~] = size(coordsY);
+figure
+imshow(img);
+hold on
+for i=1:sizeX
+    plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
+end
+hold on
+
+for i=1:sizeY
+    plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
+end
+
+pause;
+
 
 % H?r finner vi mittpunkter! :D
 minX = min(coordsX(:,3));
 minY = min(coordsY(:,4));
 maxX = max(coordsX(:,1));
-maxY = max(coordsX(:,2));
+maxY = max(coordsY(:,2));
 
 medelX = (maxX - minX)/2 + minX;
 medelY = (maxY - minY)/2 + minY;
+
+plot(medelX, medelY, 'r+');
+pause;
 
 % NW
 NWMYx = (coordsX(:,2) < medelY);
@@ -83,7 +102,7 @@ NWMx = [NWMx NWMx NWMx NWMx];
 
 NWx = coordsX.*NWMx;
 NWx(ismember(NWx,[0 0 0 0], 'rows'), :) = [];
-finalNWX = floor(mean(NWx(:,2)));
+finalNWX = floor(mean(NWx(:,2)))
 
 NWMYy = (coordsY(:,2) < medelX);
 NWMXy = (coordsY(:,3) < medelY);
@@ -92,7 +111,7 @@ NWMy = [NWMy NWMy NWMy NWMy];
 
 NWy = coordsY.*NWMy;
 NWy(ismember(NWy,[0 0 0 0], 'rows'), :) = [];
-finalNWY = floor(mean(NWy(:,1)));
+finalNWY = floor(mean(NWy(:,1)))
 
 % ---------------------- SW
 SWMYx = (coordsX(:,2) > medelY);
@@ -102,7 +121,7 @@ SWMx = [SWMx SWMx SWMx SWMx];
 
 SWx = coordsX.*SWMx;
 SWx(ismember(SWx,[0 0 0 0], 'rows'), :) = [];
-finalSWX = floor(mean(SWx(:,2)));
+finalSWX = floor(mean(SWx(:,2)))
 
 SWMYy = (coordsY(:,2) > medelX);
 SWMXy = (coordsY(:,3) < medelY);
@@ -111,7 +130,7 @@ SWMy = [SWMy SWMy SWMy SWMy];
 
 SWy = coordsY.*SWMy;
 SWy(ismember(SWy,[0 0 0 0], 'rows'), :) = [];
-finalSWY = floor(mean(SWy(:,1)));
+finalSWY = floor(mean(SWy(:,1)))
 
 % ------------------------- NE
 
@@ -122,7 +141,7 @@ NEMx = [NEMx NEMx NEMx NEMx];
 
 NEx = coordsX.*NEMx;
 NEx(ismember(NEx,[0 0 0 0], 'rows'), :) = [];
-finalNEX = floor(mean(NEx(:,2)));
+finalNEX = floor(mean(NEx(:,2)))
 
 NEMYy = (coordsY(:,2) < medelX);
 NEMXy = (coordsY(:,3) > medelY);
@@ -131,28 +150,29 @@ NEMy = [NEMy NEMy NEMy NEMy];
 
 NEy = coordsY.*NEMy;
 NEy(ismember(NEy,[0 0 0 0], 'rows'), :) = [];
-finalNEY = floor(mean(NEy(:,1)));
+finalNEY = floor(mean(NEy(:,1)))
 
 % ------------------------ SE
-SEMYx = (coordsX(:,2) > medelY);
-SEMXx = (coordsX(:,1) > medelX);
-SEMx = SEMYx.*SEMXx;
-SEMx = [SEMx SEMx SEMx SEMx];
-
-SEx = coordsX.*SEMx;
-SEx(ismember(SEx,[0 0 0 0], 'rows'), :) = [];
-finalSEX = floor(mean(SEx(:,2)));
-
-SEMYy = (coordsY(:,2) > medelX);
-SEMXy = (coordsY(:,3) > medelY);
-SEMy = SEMYy.*SEMXy;
-SEMy = [SEMy SEMy SEMy SEMy];
-
-SEy = coordsY.*SEMy;
-SEy(ismember(SEy,[0 0 0 0], 'rows'), :) = [];
-finalSEY = floor(mean(SEy(:,1)));
+% SEMYx = (coordsX(:,2) > medelY);
+% SEMXx = (coordsX(:,1) > medelX);
+% SEMx = SEMYx.*SEMXx;
+% SEMx = [SEMx SEMx SEMx SEMx];
+% 
+% SEx = coordsX.*SEMx;
+% SEx(ismember(SEx,[0 0 0 0], 'rows'), :) = [];
+% finalSEX = floor(mean(SEx(:,2)))
+% 
+% SEMYy = (coordsY(:,2) > medelX);
+% SEMXy = (coordsY(:,3) > medelY);
+% SEMy = SEMYy.*SEMXy;
+% SEMy = [SEMy SEMy SEMy SEMy];
+% 
+% SEy = coordsY.*SEMy;
+% SEy(ismember(SEy,[0 0 0 0], 'rows'), :) = [];
+% finalSEY = floor(mean(SEy(:,1)))
 
 %Rita ut v?ra punkter
+disp('Our points');
 figure;
 imshow(img);
 hold on;
@@ -160,7 +180,8 @@ plot([finalNWY,finalSWY,finalNEY,finalNWY],[finalNWX,finalSWX,finalNEX,finalNWX]
 plot(finalNWY, finalNWX, 'g*');
 plot(finalSWY, finalSWX, 'g*');
 plot(finalNEY, finalNEX, 'g*');
-plot(finalSEY, finalSEX, 'g*');
+% plot(finalSEY, finalSEX, 'g*');
+pause;
 
 %Find points with labeling and centorids
 iLabel = logical(img);
@@ -174,7 +195,7 @@ minDistNW = 1000;
 minDistNE = 1000;
 minDistSW = 1000;
 minDistSE = 1000;
-centroidsMatrix = zeros(4,2);
+centroidMatrix = zeros(4,2);
 
 for i = 1:sizeCentroids
     if(norm([centroids(i,1) centroids(i,2)] - [finalNWY finalNWX]) < minDistNW)
@@ -200,6 +221,9 @@ for i = 1:sizeCentroids
     end
     
 end
+
+% Final ponits
+plot(centroidMatrix(:,1),centroidMatrix(:,2),'b*');
 pause;
 
 
