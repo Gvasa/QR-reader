@@ -1,11 +1,13 @@
 function[centroidMatrix] = findPoints(img, coordsX, coordsY)
 
-granne = 15;
-antalgrannar = 15;
+granne = 10;
+antalgrannar = 10;
 
 % Finna storleken p? coordsX och Y
 [sizeX ~] = size(coordsX);
 [sizeY ~] = size(coordsY);
+
+coordsX = sortrows(coordsX,2);
 
 % Tar bort linjer som inte har n?gra n?ra grannar
 for i = 1:sizeX-1
@@ -22,6 +24,7 @@ for i = 1:sizeX-1
     end
 end
 
+coordsY = sortrows(coordsY,1);
 % Tar bort linjer som inte har n?gra n?ra grannar
 for i = 1:sizeY-1
     if((coordsY(i+1,1) - coordsY(i,1)) > granne)
@@ -45,23 +48,47 @@ coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 [sizeX ~] = size(coordsX);
 [sizeY ~] = size(coordsY);
 
-% Hitta linjer som sk?r varandra!
+% Hitta linjer som sk?r varandra X2
 coordsX = [coordsX zeros(sizeX,1)];
 coordsY = [coordsY zeros(sizeY,1)];
 
-% Flaggar dom som ite sk?r varandra
+%Flaggar dom som sk?r varandra mer ?n 20ggr
 for x = 1:sizeX
     for y = 1:sizeY
         if(coordsX(x,2) >= coordsY(y,4) && coordsX(x,2) <= coordsY(y,2) && coordsY(y,1) >= coordsX(x,3) && coordsY(y,1) <= coordsX(x,1))
-            coordsX(x,5) = 1;
-            coordsY(y,5) = 1;
+            coordsX(x,5) = coordsX(x,5)+1;
+            coordsY(y,5) = coordsY(y,5)+1;
+        end
+    end
+end
+
+for i=1:20
+    coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
+    coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
+end
+
+[sizeX ~] = size(coordsX);
+[sizeY ~] = size(coordsY);
+
+coordsX(:,5) = 0;
+coordsY(:,5) = 0;
+
+%Flagga dom som inte sk?r varandra mer ?n 10ggr
+
+for x = 1:sizeX
+    for y = 1:sizeY
+        if(coordsX(x,2) >= coordsY(y,4) && coordsX(x,2) <= coordsY(y,2) && coordsY(y,1) >= coordsX(x,3) && coordsY(y,1) <= coordsX(x,1))
+            coordsX(x,5) = coordsX(x,5)+1;
+            coordsY(y,5) = coordsY(y,5)+1;
         end
     end
 end
 
 % Tar bort alla flaggade sk?rningarna
-coordsX(ismember(coordsX(:,5),0, 'rows'), :) = [];
-coordsY(ismember(coordsY(:,5),0, 'rows'), :) = [];
+for i=1:10
+    coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
+    coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
+end
 coordsX(:,5) = [];
 coordsY(:,5) = [];
 
@@ -73,7 +100,6 @@ hold on
 for i=1:sizeX
     plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
 end
-hold on
 
 for i=1:sizeY
     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
@@ -81,12 +107,14 @@ end
 
 pause;
 
+coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
+coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 
 % H?r finner vi mittpunkter! :D
-minX = min(coordsX(:,3));
-minY = min(coordsY(:,4));
-maxX = max(coordsX(:,1));
-maxY = max(coordsY(:,2));
+minX = min(coordsX(:,3))
+minY = min(coordsY(:,4))
+maxX = max(coordsX(:,1))
+maxY = max(coordsY(:,2))
 
 medelX = (maxX - minX)/2 + minX;
 medelY = (maxY - minY)/2 + minY;
@@ -104,14 +132,16 @@ NWx = coordsX.*NWMx;
 NWx(ismember(NWx,[0 0 0 0], 'rows'), :) = [];
 finalNWX = floor(mean(NWx(:,2)))
 
-NWMYy = (coordsY(:,2) < medelX);
-NWMXy = (coordsY(:,3) < medelY);
+NWMYy = (coordsY(:,2) < medelX)
+NWMXy = (coordsY(:,3) < medelY)
 NWMy = NWMYy.*NWMXy;
 NWMy = [NWMy NWMy NWMy NWMy];
 
 NWy = coordsY.*NWMy;
 NWy(ismember(NWy,[0 0 0 0], 'rows'), :) = [];
 finalNWY = floor(mean(NWy(:,1)))
+
+pause;
 
 % ---------------------- SW
 SWMYx = (coordsX(:,2) > medelY);
@@ -194,8 +224,8 @@ plot(centroids(:,1),centroids(:,2), 'r*');
 minDistNW = 1000;
 minDistNE = 1000;
 minDistSW = 1000;
-minDistSE = 1000;
-centroidMatrix = zeros(4,2);
+% minDistSE = 1000;
+centroidMatrix = zeros(3,2);
 
 for i = 1:sizeCentroids
     if(norm([centroids(i,1) centroids(i,2)] - [finalNWY finalNWX]) < minDistNW)
@@ -214,12 +244,11 @@ for i = 1:sizeCentroids
         centroidMatrix(3,1) = centroids(i,1);
         centroidMatrix(3,2) = centroids(i,2);
     end
-    if(norm([centroids(i,1) centroids(i,2)] - [finalSEY finalSEX]) < minDistSE)
-        minDistSE = norm([centroids(i,1) centroids(i,2)] - [finalSEY finalSEX]);
-        centroidMatrix(4,1) = centroids(i,1);
-        centroidMatrix(4,2) = centroids(i,2);
-    end
-    
+%     if(norm([centroids(i,1) centroids(i,2)] - [finalSEY finalSEX]) < minDistSE)
+%         minDistSE = norm([centroids(i,1) centroids(i,2)] - [finalSEY finalSEX]);
+%         centroidMatrix(4,1) = centroids(i,1);
+%         centroidMatrix(4,2) = centroids(i,2);
+%     end
 end
 
 % Final ponits

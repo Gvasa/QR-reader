@@ -1,6 +1,6 @@
 function [] = testProgram()
 
-img=imread('pictures/Bygg_1.png');
+% img=imread('pictures/Bygg_1.png');
 % img=imread('pictures/Bygg_1a.png');
 % img=imread('pictures/Bygg_1b.png');
 % img=imread('pictures/Bygg_1c.png');
