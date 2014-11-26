@@ -17,7 +17,15 @@ pixelSize = min([NWtoNE NWtoSW]) / 33;
 wantedPointNW = pointNW;
 wantedPointNE = [(pixelSize*33 + pointNW(1)), pointNW(2)];
 wantedPointSW = [pointNW(1), (pixelSize*33 + pointNW(2))];
-%wantedPointSE = [wantedPointNE(1)-pixelSize*3, wantedPointSW(2)-pixelSize*3];
+
+% figure;
+% disp('New dots');
+% imshow(img);
+% hold on;
+% plot(wantedPointNW(1),wantedPointNW(2), 'r*');
+% plot(wantedPointNE(1),wantedPointNE(2), 'r*');
+% plot(wantedPointSW(1),wantedPointSW(2), 'r*');
+% pause;
 
 % Skapa matriserna vi ska anv?nda - l?gga til homogenakordinater
 transformMatrix = [wantedPointNW 1; wantedPointNE 1; wantedPointSW 1];
@@ -43,12 +51,12 @@ end
 
 m1 = floor(m*tM);
 
-newImg = zeros(imgX, imgY);
+newImg = [];
 k = 1;
 
 for i = 1:imgX
     for j = 1:imgY
-        if(m1(k,1) > 0 && m1(k,1) < imgX && m1(k,2) > 0 && m1(k,2) < imgY)
+        if(m1(k,1) > 0  && m1(k,2) > 0)
             newImg(m1(k,1), m1(k,2)) = img(i,j);
         end
         k = k+1;

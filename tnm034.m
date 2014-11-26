@@ -1,29 +1,26 @@
 function [strout] = tnm034(img)
 
 close all;
-
+% Threshholdning picture
 img = img(:,:,1);
+[sizeX, sizeY] = size(img);
+bwPic = preThresholding(img);
 
-bwPic = im2bw(img);
-bwPic = double(bwPic);
-bwPic = preThresholding(bwPic);
+% Detect, Find Points, Rotate
+[coordsX, coordsY] = detectFiducial(bwPic);
+[centroidMatrix] = findPoints(bwPic, coordsX, coordsY);
+img = rotatePicture(centroidMatrix, img);
 
-figure;
-imshow(bwPic);
-hold on;
-pause;
-
+% Detect, Find Points, Transform
+[sizeX, sizeY] = size(img);
+bwPic = preThresholding(img);
 [coordsX, coordsY] = detectFiducial(bwPic);
 [centroidMatrix] = findPoints(bwPic, coordsX, coordsY);
 [newPic, pointNW] = transformPicture(centroidMatrix, img);
 
-
-newBwPic = im2bw(newPic);
-newBwPic = double(newBwPic);
-newBwPic = medfilt2(newBwPic,[2 2]);
-imshow(newBwPic);
-pause;
-
+% 
+newBwPic = medfilt2(newPic);
+newBwPic = preThresholding(newBwPic);
 
 [coordsX, coordsY] = detectFiducial(newBwPic);
 [centroidMatrix] = findPoints(newBwPic, coordsX, coordsY);

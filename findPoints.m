@@ -1,5 +1,7 @@
 function[centroidMatrix] = findPoints(img, coordsX, coordsY)
 
+disp('Find Points');
+
 granne = 5;
 antalgrannar = 5;
 
@@ -112,10 +114,10 @@ coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
 coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 
 % H?r finner vi mittpunkter! :D
-minX = min(coordsX(:,3))
-minY = min(coordsY(:,4))
-maxX = max(coordsX(:,1))
-maxY = max(coordsY(:,2))
+minX = min(coordsX(:,3));
+minY = min(coordsY(:,4));
+maxX = max(coordsX(:,1));
+maxY = max(coordsY(:,2));
 
 medelX = (maxX - minX)/2 + minX;
 medelY = (maxY - minY)/2 + minY;
