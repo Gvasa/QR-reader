@@ -1,4 +1,4 @@
-function[perfectPic] = readImg(img, boxSize, pointNW)
+function[perfectPic] = readImg(img, boxSize, centroidMatrix)
 
 
 newImg = preThresholding(img);
@@ -7,8 +7,8 @@ perfectPic = zeros(41);
 imshow(newImg);
 hold on;
 
-startPosX = floor(pointNW(1)-boxSize*3);
-startPosY = floor(pointNW(2)-boxSize*3);
+startPosX = floor((centroidMatrix(1,1))-boxSize*3.5);
+startPosY = floor((centroidMatrix(1,2))-boxSize*3.5);
 
 for col = 1 : 41
    for row = 1 : 41
@@ -25,5 +25,5 @@ for col = 1 : 41
    end 
 end
 
-figure;
-imshow(perfectPic);
+% figure;
+% imshow(perfectPic);

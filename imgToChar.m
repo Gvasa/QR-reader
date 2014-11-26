@@ -30,7 +30,3 @@ binMat = zeros(183, 8);
  end
  
  char(charMat)
- 
- 
- 1 1 0 0 1 1 1 
- 1110011

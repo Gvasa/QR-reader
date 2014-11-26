@@ -128,13 +128,7 @@ state = 0;
 i = 1;
 
 for j = 1 : colSize
-    while(i<=rowSize)
-%         if(j == 101 && i > 512 & i < 600)
-%             plot(j,i, 'r*');
-%             state
-%             pause;
-%         end
-        
+    while(i<=rowSize)        
         switch state
             case 0
                 if(img(i,j) == 1 && img(i+1,j) == 0)
@@ -233,15 +227,15 @@ for j = 1 : colSize
     i=1;
 end
 
-figure;
-% -------------------------- PLOT SHIT
-imshow(img);
-hold on;
-
 coordsX = coordsX(1:counterCoordsX,:);
 coordsY = coordsY(1:counterCoordsY,:);
 coordsX = sortrows(coordsX,1);
 coordsY = sortrows(coordsY,1);
+
+% -------------------------- PLOT SHIT
+figure;
+imshow(img);
+hold on;
 
 for i=1:counterCoordsX
     plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);

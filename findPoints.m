@@ -1,7 +1,7 @@
 function[centroidMatrix] = findPoints(img, coordsX, coordsY)
 
-granne = 10;
-antalgrannar = 10;
+granne = 5;
+antalgrannar = 5;
 
 % Finna storleken p? coordsX och Y
 [sizeX ~] = size(coordsX);
@@ -62,7 +62,9 @@ for x = 1:sizeX
     end
 end
 
-for i=1:20
+intervall = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.66);
+
+for i=1:intervall
     coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
     coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
 end
@@ -74,7 +76,6 @@ coordsX(:,5) = 0;
 coordsY(:,5) = 0;
 
 %Flagga dom som inte sk?r varandra mer ?n 10ggr
-
 for x = 1:sizeX
     for y = 1:sizeY
         if(coordsX(x,2) >= coordsY(y,4) && coordsX(x,2) <= coordsY(y,2) && coordsY(y,1) >= coordsX(x,3) && coordsY(y,1) <= coordsX(x,1))
@@ -84,8 +85,10 @@ for x = 1:sizeX
     end
 end
 
+intervall = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.66);
+
 % Tar bort alla flaggade sk?rningarna
-for i=1:10
+for i=1:intervall
     coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
     coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
 end
@@ -105,8 +108,6 @@ for i=1:sizeY
     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
 end
 
-pause;
-
 coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
 coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 
@@ -119,9 +120,8 @@ maxY = max(coordsY(:,2))
 medelX = (maxX - minX)/2 + minX;
 medelY = (maxY - minY)/2 + minY;
 
-plot(medelX, medelY, 'r+');
-pause;
-
+% plot(medelX, medelY, 'r+');
+% pause;
 % NW
 NWMYx = (coordsX(:,2) < medelY);
 NWMXx = (coordsX(:,1) < medelX);
@@ -130,18 +130,16 @@ NWMx = [NWMx NWMx NWMx NWMx];
 
 NWx = coordsX.*NWMx;
 NWx(ismember(NWx,[0 0 0 0], 'rows'), :) = [];
-finalNWX = floor(mean(NWx(:,2)))
+finalNWX = floor(mean(NWx(:,2)));
 
-NWMYy = (coordsY(:,2) < medelX)
-NWMXy = (coordsY(:,3) < medelY)
+NWMYy = (coordsY(:,2) < medelY);
+NWMXy = (coordsY(:,3) < medelX);
 NWMy = NWMYy.*NWMXy;
 NWMy = [NWMy NWMy NWMy NWMy];
 
 NWy = coordsY.*NWMy;
 NWy(ismember(NWy,[0 0 0 0], 'rows'), :) = [];
-finalNWY = floor(mean(NWy(:,1)))
-
-pause;
+finalNWY = floor(mean(NWy(:,1)));
 
 % ---------------------- SW
 SWMYx = (coordsX(:,2) > medelY);
@@ -151,16 +149,16 @@ SWMx = [SWMx SWMx SWMx SWMx];
 
 SWx = coordsX.*SWMx;
 SWx(ismember(SWx,[0 0 0 0], 'rows'), :) = [];
-finalSWX = floor(mean(SWx(:,2)))
+finalSWX = floor(mean(SWx(:,2)));
 
-SWMYy = (coordsY(:,2) > medelX);
-SWMXy = (coordsY(:,3) < medelY);
+SWMYy = (coordsY(:,2) > medelY);
+SWMXy = (coordsY(:,3) < medelX);
 SWMy = SWMYy.*SWMXy;
 SWMy = [SWMy SWMy SWMy SWMy];
 
 SWy = coordsY.*SWMy;
 SWy(ismember(SWy,[0 0 0 0], 'rows'), :) = [];
-finalSWY = floor(mean(SWy(:,1)))
+finalSWY = floor(mean(SWy(:,1)));
 
 % ------------------------- NE
 
@@ -171,16 +169,16 @@ NEMx = [NEMx NEMx NEMx NEMx];
 
 NEx = coordsX.*NEMx;
 NEx(ismember(NEx,[0 0 0 0], 'rows'), :) = [];
-finalNEX = floor(mean(NEx(:,2)))
+finalNEX = floor(mean(NEx(:,2)));
 
-NEMYy = (coordsY(:,2) < medelX);
-NEMXy = (coordsY(:,3) > medelY);
+NEMYy = (coordsY(:,2) < medelY);
+NEMXy = (coordsY(:,3) > medelX);
 NEMy = NEMYy.*NEMXy;
 NEMy = [NEMy NEMy NEMy NEMy];
 
 NEy = coordsY.*NEMy;
 NEy(ismember(NEy,[0 0 0 0], 'rows'), :) = [];
-finalNEY = floor(mean(NEy(:,1)))
+finalNEY = floor(mean(NEy(:,1)));
 
 % ------------------------ SE
 % SEMYx = (coordsX(:,2) > medelY);
@@ -202,16 +200,16 @@ finalNEY = floor(mean(NEy(:,1)))
 % finalSEY = floor(mean(SEy(:,1)))
 
 %Rita ut v?ra punkter
-disp('Our points');
-figure;
-imshow(img);
-hold on;
-plot([finalNWY,finalSWY,finalNEY,finalNWY],[finalNWX,finalSWX,finalNEX,finalNWX],'Color','g','LineWidth',1);
-plot(finalNWY, finalNWX, 'g*');
-plot(finalSWY, finalSWX, 'g*');
-plot(finalNEY, finalNEX, 'g*');
-% plot(finalSEY, finalSEX, 'g*');
-pause;
+% disp('Our points');
+% figure;
+% imshow(img);
+% hold on;
+% plot([finalNWY,finalSWY,finalNEY,finalNWY],[finalNWX,finalSWX,finalNEX,finalNWX],'Color','g','LineWidth',1);
+% plot(finalNWY, finalNWX, 'g*');
+% plot(finalSWY, finalSWX, 'g*');
+% plot(finalNEY, finalNEX, 'g*');
+% % plot(finalSEY, finalSEX, 'g*');
+% pause;
 
 %Find points with labeling and centorids
 iLabel = logical(img);
@@ -252,7 +250,10 @@ for i = 1:sizeCentroids
 end
 
 % Final ponits
-plot(centroidMatrix(:,1),centroidMatrix(:,2),'b*');
-pause;
+% figure 
+% imshow(img);
+% hold on
+% plot(centroidMatrix(:,1),centroidMatrix(:,2),'b*');
+% pause;
 
 

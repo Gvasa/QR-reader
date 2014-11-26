@@ -2,48 +2,46 @@ function [strout] = tnm034(img)
 
 close all;
 
+img = img(:,:,1);
+
 bwPic = im2bw(img);
 bwPic = double(bwPic);
+bwPic = preThresholding(bwPic);
 
-c = corner(bwPic, 1000);
+figure;
 imshow(bwPic);
 hold on;
-plot(c(:,1), c(:,2), 'b*');
-
 pause;
 
 [coordsX, coordsY] = detectFiducial(bwPic);
-[centroidMatrix, minmaxMatrix, fidNWwidth, fidNEwidth, distanceBetweenFid] = findPoints(bwPic, coordsX, coordsY);
-[newPic, pointNW, boxSize] = transformPicture(centroidMatrix, minmaxMatrix, img);
+[centroidMatrix] = findPoints(bwPic, coordsX, coordsY);
+[newPic, pointNW] = transformPicture(centroidMatrix, img);
 
 
 newBwPic = im2bw(newPic);
 newBwPic = double(newBwPic);
+[sizeX sizeY] = size(newBwPic); 
+for i = 1:500
+    for j = 1:512
+        if (filled(i,j) == 0 && i > 1 && i < 500 && j > 1 && j < 512)
+            nearest = newPic(i-1:i+1, j-1:j+1);
+            nearest_filled = filled(i-1:i+1, j-1:j+1);
+
+            newPic(i, j) = sum(sum(nearest .* nearest_filled)) / sum(nearest_filled(:));
+        end
+    end
+end
+
+newPic = newPic / max(newPic(:));
+imshow(newBwPic);
+pause;
+
 
 [coordsX, coordsY] = detectFiducial(newBwPic);
-[centroidMatrix, minmaxMatrix, fidNWwidth, fidNEwidth, distanceBetweenFid] = findPoints(newBwPic, coordsX, coordsY);
-boxSize = findBoxSize(fidNWwidth, fidNEwidth, distanceBetweenFid)
-perfectPic = readImg(newPic, boxSize, pointNW);
+[centroidMatrix] = findPoints(newBwPic, coordsX, coordsY);
+boxSize = findBoxSize(centroidMatrix);
+perfectPic = readImg(newPic, boxSize, centroidMatrix);
 imgToChar(perfectPic);
-% 
-startPosX = pointNW(1)-boxSize*3;
-startPosY = pointNW(2)-boxSize*3;
-
-% figure;
-% imshow(preThresholding(newPic));
-% hold on
-% for col = 1 : 41
-%    for row = 1 : 41
-%        startX = startPosX+floor((row-1)*boxSize);
-%        startY = startPosY+floor((col-1)*boxSize);
-%        slutX = startPosX+floor((row)*boxSize);
-%        slutY = startPosY+floor((col)*boxSize);
-%        
-%        plot([startX, slutX, slutX, startX, startX],[startY, startY, slutY, slutY, startY],'c','LineWidth',1);
-%        hold on;
-%    end 
-% end
-
 
 
 
