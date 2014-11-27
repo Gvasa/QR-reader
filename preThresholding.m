@@ -1,5 +1,4 @@
 function[newPic] = preThresholding(img)
-close all;
 
 % HItta max och min i bilden
 maxPic = max(img(:));

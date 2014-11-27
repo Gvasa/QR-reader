@@ -99,16 +99,17 @@ coordsY(:,5) = [];
 
 [sizeX ~] = size(coordsX);
 [sizeY ~] = size(coordsY);
-figure
-imshow(img);
-hold on
-for i=1:sizeX
-    plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
-end
 
-for i=1:sizeY
-    plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
-end
+% figure
+% imshow(img);
+% hold on
+% for i=1:sizeX
+%     plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
+% end
+% 
+% for i=1:sizeY
+%     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
+% end
 
 coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
 coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];

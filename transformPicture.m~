@@ -1,10 +1,12 @@
 function [newImg,pointNW] = transformPicture(centroidMatrix, img)
 
+disp('Transform Img');
+
 % Punkterna
 pointNW = [centroidMatrix(1,1) centroidMatrix(1,2)];
 pointNE = [centroidMatrix(2,1) centroidMatrix(2,2)];
 pointSW = [centroidMatrix(3,1) centroidMatrix(3,2)];
-% pointSE = [centroidMatrix(4,1) centroidMatrix(4,2)];
+pointSE = [centroidMatrix(4,1) centroidMatrix(4,2)];
 
 % Ta ut l?ngden mellan de olika fid
 NWtoNE = (norm(pointNW - pointNE));
@@ -17,11 +19,21 @@ pixelSize = min([NWtoNE NWtoSW]) / 33;
 wantedPointNW = pointNW;
 wantedPointNE = [(pixelSize*33 + pointNW(1)), pointNW(2)];
 wantedPointSW = [pointNW(1), (pixelSize*33 + pointNW(2))];
-%wantedPointSE = [wantedPointNE(1)-pixelSize*3, wantedPointSW(2)-pixelSize*3
+wantedPointSE = [wantedPointNE(1)-3*pixelSize, wantedPointSW(2)-3*pixelSize];
+
+figure;
+disp('New dots');
+imshow(img);
+hold on;
+plot(wantedPointNW(1),wantedPointNW(2), 'r*');
+plot(wantedPointNE(1),wantedPointNE(2), 'g*');
+plot(wantedPointSW(1),wantedPointSW(2), 'c*');
+plot(wantedPointSE(1),wantedPointSE(2), 'b*');
+pause;
 
 % Skapa matriserna vi ska anv?nda - l?gga til homogenakordinater
-transformMatrix = [wantedPointNW 1; wantedPointNE 1; wantedPointSW 1];
-centroidMatrixTemp = [centroidMatrix ones(3,1)];
+transformMatrix = [wantedPointNW 1; wantedPointNE 1; wantedPointSW 1; wantedPointSE 1;];
+centroidMatrixTemp = [centroidMatrix ones(4,1)];
 
 % R?kna ut transformationsmatrisen
 tM = transformMatrix\centroidMatrixTemp;
