@@ -133,7 +133,7 @@ NWMx = [NWMx NWMx NWMx NWMx];
 
 NWx = coordsX.*NWMx;
 NWx(ismember(NWx,[0 0 0 0], 'rows'), :) = [];
-finalNWX = floor(mean(NWx(:,2)));
+finalNWX = (mean(NWx(:,2)));
 
 NWMYy = (coordsY(:,2) < medelY);
 NWMXy = (coordsY(:,3) < medelX);
@@ -142,7 +142,7 @@ NWMy = [NWMy NWMy NWMy NWMy];
 
 NWy = coordsY.*NWMy;
 NWy(ismember(NWy,[0 0 0 0], 'rows'), :) = [];
-finalNWY = floor(mean(NWy(:,1)));
+finalNWY = (mean(NWy(:,1)));
 
 % ---------------------- SW
 SWMYx = (coordsX(:,2) > medelY);
@@ -152,7 +152,7 @@ SWMx = [SWMx SWMx SWMx SWMx];
 
 SWx = coordsX.*SWMx;
 SWx(ismember(SWx,[0 0 0 0], 'rows'), :) = [];
-finalSWX = floor(mean(SWx(:,2)));
+finalSWX = (mean(SWx(:,2)));
 
 SWMYy = (coordsY(:,2) > medelY);
 SWMXy = (coordsY(:,3) < medelX);
@@ -161,7 +161,7 @@ SWMy = [SWMy SWMy SWMy SWMy];
 
 SWy = coordsY.*SWMy;
 SWy(ismember(SWy,[0 0 0 0], 'rows'), :) = [];
-finalSWY = floor(mean(SWy(:,1)));
+finalSWY = (mean(SWy(:,1)));
 
 % ------------------------- NE
 
@@ -172,7 +172,7 @@ NEMx = [NEMx NEMx NEMx NEMx];
 
 NEx = coordsX.*NEMx;
 NEx(ismember(NEx,[0 0 0 0], 'rows'), :) = [];
-finalNEX = floor(mean(NEx(:,2)));
+finalNEX = (mean(NEx(:,2)));
 
 NEMYy = (coordsY(:,2) < medelY);
 NEMXy = (coordsY(:,3) > medelX);
@@ -181,51 +181,19 @@ NEMy = [NEMy NEMy NEMy NEMy];
 
 NEy = coordsY.*NEMy;
 NEy(ismember(NEy,[0 0 0 0], 'rows'), :) = [];
-finalNEY = floor(mean(NEy(:,1)));
-
-% ------------------------ SE
-% SEMYx = (coordsX(:,2) > medelY);
-% SEMXx = (coordsX(:,1) > medelX);
-% SEMx = SEMYx.*SEMXx;
-% SEMx = [SEMx SEMx SEMx SEMx];
-% 
-% SEx = coordsX.*SEMx;
-% SEx(ismember(SEx,[0 0 0 0], 'rows'), :) = [];
-% finalSEX = floor(mean(SEx(:,2)))
-% 
-% SEMYy = (coordsY(:,2) > medelX);
-% SEMXy = (coordsY(:,3) > medelY);
-% SEMy = SEMYy.*SEMXy;
-% SEMy = [SEMy SEMy SEMy SEMy];
-% 
-% SEy = coordsY.*SEMy;
-% SEy(ismember(SEy,[0 0 0 0], 'rows'), :) = [];
-% finalSEY = floor(mean(SEy(:,1)))
-
-%Rita ut v?ra punkter
-% disp('Our points');
-% figure;
-% imshow(img);
-% hold on;
-% plot([finalNWY,finalSWY,finalNEY,finalNWY],[finalNWX,finalSWX,finalNEX,finalNWX],'Color','g','LineWidth',1);
-% plot(finalNWY, finalNWX, 'g*');
-% plot(finalSWY, finalSWX, 'g*');
-% plot(finalNEY, finalNEX, 'g*');
-% % plot(finalSEY, finalSEX, 'g*');
-% pause;
+finalNEY = (mean(NEy(:,1)));
 
 %Find points with labeling and centorids
 iLabel = logical(img);
 stat = regionprops(iLabel, 'centroid');
 centroids = cat(1,stat.Centroid);
-plot(centroids(:,1),centroids(:,2), 'r*');
+% plot(centroids(:,1),centroids(:,2), 'r*');
 
 %Para ihop och finn de som ?r lika
 [sizeCentroids ~] = size(centroids);
 minDistNW = 1000;
 minDistNE = 1000;
 minDistSW = 1000;
-% minDistSE = 1000;
 centroidMatrix = zeros(3,2);
 
 for i = 1:sizeCentroids
@@ -245,11 +213,6 @@ for i = 1:sizeCentroids
         centroidMatrix(3,1) = centroids(i,1);
         centroidMatrix(3,2) = centroids(i,2);
     end
-%     if(norm([centroids(i,1) centroids(i,2)] - [finalSEY finalSEX]) < minDistSE)
-%         minDistSE = norm([centroids(i,1) centroids(i,2)] - [finalSEY finalSEX]);
-%         centroidMatrix(4,1) = centroids(i,1);
-%         centroidMatrix(4,2) = centroids(i,2);
-%     end
 end
 
 % Final ponits

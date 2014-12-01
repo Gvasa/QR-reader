@@ -1,4 +1,4 @@
-function[] = imgToChar(img)
+function[charMat] = imgToChar(img)
  
 binMat = zeros(183, 8);
  
@@ -26,7 +26,11 @@ binMat = zeros(183, 8);
  
  
  for i = 1:183
-     charMat(1,i) = char(bi2de(fliplr(binMat(i, :))));
+     charMat(1,i) = bi2de(fliplr(binMat(i, :)));
+    if binMat(i, :) == 0
+        charMat = charMat(1, 1:i-1);
+        break;
+    end
  end
  
- char(charMat)
+%  char(charMat);

@@ -289,7 +289,7 @@ alignPX = floor(mean(coordsY(:,1)));
 iLabel = logical(cropedImg);
 stat = regionprops(iLabel, 'centroid');
 centroids = cat(1,stat.Centroid);
-plot(centroids(:,1),centroids(:,2), 'b*');
+% plot(centroids(:,1),centroids(:,2), 'b*');
 
 % Find the centridPoint that matches our point best.
 [sizeCentroids ~] = size(centroids);
