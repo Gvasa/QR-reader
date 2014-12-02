@@ -30,8 +30,8 @@ imshow(newBwPic);
 [centroidMatrix] = findPoints(newBwPic, coordsX, coordsY);
 boxSize = findBoxSize(centroidMatrix);
 perfectPic = readImg(newBwPic, boxSize, centroidMatrix);
-strout = (imgToChar(perfectPic))
-char(strout)
+strout = (imgToChar(perfectPic));
+char(strout);
 
 
 
