@@ -2,21 +2,28 @@ function[thePoint] = findAlignP(centroidMatrix, img)
 
 disp('Find Aligntment Pattern');
 
+padVolume = 500;
+
 % Our points
-pointNW = [centroidMatrix(1,1) centroidMatrix(1,2)];
-pointNE = [centroidMatrix(2,1) centroidMatrix(2,2)];
-pointSW = [centroidMatrix(3,1) centroidMatrix(3,2)];
+pointNW = [centroidMatrix(1,1)+padVolume centroidMatrix(1,2)+padVolume];
+pointNE = [centroidMatrix(2,1)+padVolume centroidMatrix(2,2)+padVolume];
+pointSW = [centroidMatrix(3,1)+padVolume centroidMatrix(3,2)+padVolume];
 
 %Find Length between the points
 distance_NW_NE = norm(pointNW-pointNE);
 distance_NW_SW = norm(pointNW-pointSW);
 
+img = padarray(img, [padVolume padVolume], 1,'both');
+
 % Find points for crop the picture and crop
-from_X = (pointNW(1)+distance_NW_NE*0.7);
+from_X = (pointNE(1)-distance_NW_NE*0.25);
 to_X = pointNE(1)+distance_NW_NE*0.2;
-from_Y = (pointNW(2)+distance_NW_SW*0.7);
+from_Y = (pointSW(2)-distance_NW_SW*0.25);
 to_Y = pointSW(2)+distance_NW_SW*0.2;
 cropedImg = img(from_Y:to_Y, from_X:to_X);
+% disp('----- Croped Img ----');
+% imshow(cropedImg);
+% pause;
 
 %                           %
 %                           %    
@@ -30,8 +37,8 @@ whiteCounter = 0;
 blackCounter = 0;
 
 % Con. interval
-upperRate = 1.2;
-lowerRate = 0.8;
+upperRate = 1.5;
+lowerRate = 0.5;
 
 coordsX = zeros(100000,4);
 coordsY = zeros(100000,4);
@@ -335,7 +342,8 @@ alignPX = floor(mean(coordsY(:,1)));
 iLabel = logical(cropedImg);
 stat = regionprops(iLabel, 'centroid');
 centroids = cat(1,stat.Centroid);
-% plot(centroids(:,1),centroids(:,2), 'b*');
+%plot(centroids(:,1),centroids(:,2), 'b*');
+%pause;
 
 % Find the centridPoint that matches our point best.
 [sizeCentroids ~] = size(centroids);
@@ -351,7 +359,7 @@ for i = 1:sizeCentroids
 end
 
 % Set the point to the orignal coord-system
-thePoint(1,1) = thePoint(1,1)+from_X;
-thePoint(1,2) = thePoint(1,2)+from_Y;
+thePoint(1,1) = thePoint(1,1)+from_X-padVolume;
+thePoint(1,2) = thePoint(1,2)+from_Y-padVolume;
 
                 

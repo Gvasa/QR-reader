@@ -9,11 +9,10 @@ img = IllumFix(img);
 [sizeX, sizeY] = size(img);
 bwPic = preThresholding(img);
 
-% Detect, Find Points, Rotate
-% [coordsX, coordsY] = detectFiducial(bwPic);
-% [centroidMatrix] = findPoints(bwPic, coordsX, coordsY);
-% img = rotatePicture(centroidMatrix, img);
-% imshow(img);
+%Detect, Find Points, Rotate
+[coordsX, coordsY] = detectFiducial(bwPic);
+[centroidMatrix] = findPoints(bwPic, coordsX, coordsY);
+img = rotatePicture(centroidMatrix, img);
 
 % Detect, Find Points, Transform
 [sizeX, sizeY] = size(img);
@@ -21,6 +20,11 @@ bwPic = preThresholding(img);
 [coordsX, coordsY] = detectFiducial(bwPic);
 [centroidMatrix] = findPoints(bwPic, coordsX, coordsY);
 centroidMatrix = [centroidMatrix; findAlignP(centroidMatrix, bwPic)];
+% figure;
+% imshow(img);
+% hold on;
+% plot(centroidMatrix(:,1), centroidMatrix(:,2), 'r*');
+% pause;
 [newPic, pointNW] = transformPicture(centroidMatrix, img);
 
 % Filt and threshhold
