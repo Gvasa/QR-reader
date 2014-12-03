@@ -2,8 +2,8 @@ function[centroidMatrix] = findPoints(img, coordsX, coordsY)
 
 disp('Find Points');
 
-granne = 5;
-antalgrannar = 5;
+granne = 1;
+antalgrannar = 3;
 
 % Finna storleken p? coordsX och Y
 [sizeX ~] = size(coordsX);
@@ -34,9 +34,15 @@ for i = 1:sizeY-1
     end
 end
 
+coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
+coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
+
+[sizeX ~] = size(coordsX);
+[sizeY ~] = size(coordsY);
+
 % Flaggar linjer som har grannar men f?
 for i = 1:sizeY-1
-    if(sum(ismember(coordsY(:,2),coordsY(i,2), 'rows')) < antalgrannar)
+    if(sum(ismember(coordsY(:,2),  coordsY(i,2)  , 'rows')) < antalgrannar)
         mask = (1-ismember(coordsY(:,2),coordsY(i,2), 'rows'));
         mask = [mask, mask, mask, mask];
         coordsY = coordsY.*mask;
@@ -50,55 +56,37 @@ coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 [sizeX ~] = size(coordsX);
 [sizeY ~] = size(coordsY);
 
-% Hitta linjer som sk?r varandra X2
-coordsX = [coordsX zeros(sizeX,1)];
-coordsY = [coordsY zeros(sizeY,1)];
+% Check Size
+[sizeX, ~] = size(coordsX);
+[sizeY, ~] = size(coordsY);
 
-%Flaggar dom som sk?r varandra mer ?n 20ggr
-for x = 1:sizeX
-    for y = 1:sizeY
-        if(coordsX(x,2) >= coordsY(y,4) && coordsX(x,2) <= coordsY(y,2) && coordsY(y,1) >= coordsX(x,3) && coordsY(y,1) <= coordsX(x,1))
-            coordsX(x,5) = coordsX(x,5)+1;
-            coordsY(y,5) = coordsY(y,5)+1;
+% Index how many times intersect - Remove [Twice]
+for i=1:2
+    coordsX = [coordsX zeros(sizeX,1)];
+    coordsY = [coordsY zeros(sizeY,1)];
+
+    for x = 1:sizeX
+        for y = 1:sizeY
+            if(coordsX(x,2) >= coordsY(y,4) && coordsX(x,2) <= coordsY(y,2) && coordsY(y,1) >= coordsX(x,3) && coordsY(y,1) <= coordsX(x,1))
+                coordsX(x,5) = coordsX(x,5)+1;
+                coordsY(y,5) = coordsY(y,5)+1;
+            end
         end
     end
-end
+    
+    intervall = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.8);
 
-intervall = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.66);
-
-for i=1:intervall
-    coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
-    coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
-end
-
-[sizeX ~] = size(coordsX);
-[sizeY ~] = size(coordsY);
-
-coordsX(:,5) = 0;
-coordsY(:,5) = 0;
-
-%Flagga dom som inte sk?r varandra mer ?n 10ggr
-for x = 1:sizeX
-    for y = 1:sizeY
-        if(coordsX(x,2) >= coordsY(y,4) && coordsX(x,2) <= coordsY(y,2) && coordsY(y,1) >= coordsX(x,3) && coordsY(y,1) <= coordsX(x,1))
-            coordsX(x,5) = coordsX(x,5)+1;
-            coordsY(y,5) = coordsY(y,5)+1;
-        end
+    for i=1:intervall
+        coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
+        coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
     end
+    
+    [sizeX, ~] = size(coordsX);
+    [sizeY, ~] = size(coordsY);
+
+    coordsX = coordsX(:, 1:4);
+    coordsY = coordsY(:, 1:4);
 end
-
-intervall = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.66);
-
-% Tar bort alla flaggade sk?rningarna
-for i=1:intervall
-    coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
-    coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
-end
-coordsX(:,5) = [];
-coordsY(:,5) = [];
-
-[sizeX ~] = size(coordsX);
-[sizeY ~] = size(coordsY);
 
 % figure
 % imshow(img);
@@ -110,6 +98,7 @@ coordsY(:,5) = [];
 % for i=1:sizeY
 %     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
 % end
+% pause;
 
 coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
 coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
@@ -191,9 +180,9 @@ centroids = cat(1,stat.Centroid);
 
 %Para ihop och finn de som ?r lika
 [sizeCentroids ~] = size(centroids);
-minDistNW = 1000;
-minDistNE = 1000;
-minDistSW = 1000;
+minDistNW = 10000;
+minDistNE = 10000;
+minDistSW = 10000;
 centroidMatrix = zeros(3,2);
 
 for i = 1:sizeCentroids

@@ -2,15 +2,18 @@ function [strout] = tnm034(img)
 
 close all;
 
+% Reduce noice and Illum-problems
+img = IllumFix(img);
+
 % Threshhold the picture
-img = img(:,:,1);
 [sizeX, sizeY] = size(img);
 bwPic = preThresholding(img);
 
 % Detect, Find Points, Rotate
-[coordsX, coordsY] = detectFiducial(bwPic);
-[centroidMatrix] = findPoints(bwPic, coordsX, coordsY);
-img = rotatePicture(centroidMatrix, img);
+% [coordsX, coordsY] = detectFiducial(bwPic);
+% [centroidMatrix] = findPoints(bwPic, coordsX, coordsY);
+% img = rotatePicture(centroidMatrix, img);
+% imshow(img);
 
 % Detect, Find Points, Transform
 [sizeX, sizeY] = size(img);
@@ -23,7 +26,6 @@ centroidMatrix = [centroidMatrix; findAlignP(centroidMatrix, bwPic)];
 % Filt and threshhold
 newBwPic = medfilt2(newPic);
 newBwPic = preThresholding(newBwPic);
-imshow(newBwPic);
 
 % Dectect, Find points, findBoxSize and read
 [coordsX, coordsY] = detectFiducial(newBwPic);

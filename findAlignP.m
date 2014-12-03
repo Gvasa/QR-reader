@@ -234,6 +234,51 @@ coordsY = coordsY(1:counterCoordsY,:);
 % 
 % pause;
 
+granne = 5;
+antalgrannar = 5;
+
+% Finna storleken p? coordsX och Y
+[sizeX ~] = size(coordsX);
+[sizeY ~] = size(coordsY);
+
+coordsX = sortrows(coordsX,2);
+
+% Tar bort linjer som inte har n?gra n?ra grannar
+for i = 1:sizeX-1
+    if((coordsX(i+1,2) - coordsX(i,2)) > granne)
+        coordsX(i,:) = [0, 0, 0 ,0];
+    end
+end
+% Flaggar linjer som har grannar men f?
+for i = 1:sizeX-1
+    if(sum(ismember(coordsX(:,1),coordsX(i,1), 'rows')) < antalgrannar)
+        mask = (1-ismember(coordsX(:,1),coordsX(i,1), 'rows'));
+        mask = [mask, mask, mask, mask];
+        coordsX = coordsX.*mask;
+    end
+end
+
+coordsY = sortrows(coordsY,1);
+% Tar bort linjer som inte har n?gra n?ra grannar
+for i = 1:sizeY-1
+    if((coordsY(i+1,1) - coordsY(i,1)) > granne)
+        coordsY(i,:) = [0, 0, 0 ,0];
+    end
+end
+
+% Flaggar linjer som har grannar men f?
+for i = 1:sizeY-1
+    if(sum(ismember(coordsY(:,2),coordsY(i,2), 'rows')) < antalgrannar)
+        mask = (1-ismember(coordsY(:,2),coordsY(i,2), 'rows'));
+        mask = [mask, mask, mask, mask];
+        coordsY = coordsY.*mask;
+    end
+end
+
+% Tar bort linjer som ?r flaggade
+coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
+coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
+
 % Check Size
 [sizeX, ~] = size(coordsX);
 [sizeY, ~] = size(coordsY);
@@ -251,14 +296,14 @@ for i=1:2
             end
         end
     end
-
+    
     intervall = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.66);
 
     for i=1:intervall
         coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
         coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
     end
-
+    
     [sizeX, ~] = size(coordsX);
     [sizeY, ~] = size(coordsY);
 
@@ -280,6 +325,7 @@ coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 % for i=1:sizeY
 %     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
 % end
+% pause
 
 % Find our point by our lines
 alignPY = floor(mean(coordsX(:,2)));
