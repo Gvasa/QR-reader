@@ -1,115 +1,31 @@
 function [newImg,pointNW] = transformPicture(centroidMatrix, img)
 
-disp('Transform Img');
-
-% Punkterna
+% Our reference points
 pointNW = [centroidMatrix(1,1) centroidMatrix(1,2)];
 pointNE = [centroidMatrix(2,1) centroidMatrix(2,2)];
 pointSW = [centroidMatrix(3,1) centroidMatrix(3,2)];
 pointSE = [centroidMatrix(4,1) centroidMatrix(4,2)];
 
-% Ta ut l?ngden mellan de olika fid
+% Check distance between points
 NWtoNE = (norm(pointNW - pointNE));
 NWtoSW = (norm(pointNW - pointSW));
 
-% R?kna ut pixelstorleken
+% Calculate boxSize
 pixelSize = min([NWtoNE NWtoSW]) / 34;
 
-% Definera punkterna vi vill ha
+% Define out new points
 wantedPointNW = pointNW;
 wantedPointNE = [(pixelSize*34 + pointNW(1)), pointNW(2)];
 wantedPointSW = [pointNW(1), (pixelSize*34 + pointNW(2))];
 wantedPointSE = [wantedPointNE(1)-3*pixelSize, wantedPointSW(2)-3*pixelSize];
 
-% figure;
-% disp('New dots');
-% imshow(img);
-% hold on;
-% plot(wantedPointNW(1),wantedPointNW(2), 'r*');
-% plot(wantedPointNE(1),wantedPointNE(2), 'g*');
-% plot(wantedPointSW(1),wantedPointSW(2), 'c*');
-% plot(wantedPointSE(1),wantedPointSE(2), 'b*');
-
-
-% Skapa matriserna vi ska anv?nda - l?gga til homogenakordinater
+% Create matrix with homogeneous coordinates
 centroidMatrixTemp = [centroidMatrix ones(4,1)];
 transformMatrix = [wantedPointNW 1; wantedPointNE 1; wantedPointSW 1; wantedPointSE 1];
 transformMatrix = [wantedPointNW; wantedPointNE; wantedPointSW; wantedPointSE];
-% plot(transformMatrix(:,1), transformMatrix(:,2), 'ro');
-% plot(centroidMatrixTemp(:,1), centroidMatrixTemp(:,2), 'r+');
 
+% Calculate transform matrix
 tM = fitgeotrans(centroidMatrix,transformMatrix, 'projective');
+
+% Transform the image
 newImg = imwarp(img, tM);
-% figure;
-% imshow(newImg);
-% pause;
-
-% % R?kna ut transformationsmatrisen
-% tM = transformMatrix\centroidMatrixTemp;
-% c = centroidMatrixTemp*tM;
-% plot(c(:,1), c(:,2), 'g*');
-% pause;
-% 
-% [imgX, imgY] = size(img);
-% newImg = zeros(imgX*1.2, imgY*1.2);
-% for i = 1:imgX
-%     for j = 1:imgY
-%         uvw = [i, j, 1] * tM;
-%         u = round(uvw(1) / uvw(3));
-%         v = round(uvw(2) / uvw(3));
-%         if (u > 0 && u <= imgX*1.2 && v > 0 && v <= imgY*1.2)
-%             newImg(u, v) = newImg(u,v) + img(i, j);
-%         end
-%     end
-% end
-
-% k = 1;
-% [imgX, imgY] = size(img);
-% m = zeros(imgX * imgY,3);
-% 
-% for i = 1:imgX
-%     for j = 1:imgY
-%         m(k,1) = i;
-%         m(k,2) = j;
-%         m(k,3) = 1;
-%         k = k+1;
-%     end
-%     k = k+1;
-% end
-% 
-% 
-% m1 = floor(m*tM);
-% 
-% newImg = [];
-% k = 1;
-% 
-% for i = 1:imgX
-%     for j = 1:imgY
-%         if(m1(k,1) > 0  && m1(k,2) > 0)
-%             newImg(m1(k,1), m1(k,2)) = img(i,j);
-%         end
-%         k = k+1;
-%     end
-%     k = k+1;
-% end
-
-% newImg = newImg/255;
-
-% Plot our points
-% figure
-% imshow(newImg);
-% hold on;
-
-% plot([transformMatrix(:,1); transformMatrix(1,1)],[transformMatrix(:,2); transformMatrix(1,2)],'Color','c','LineWidth',1);
-% plot(transformMatrix(1,1), transformMatrix(1,2), 'c*');
-% plot(transformMatrix(2,1), transformMatrix(2,2), 'c*');
-% plot(transformMatrix(3,1), transformMatrix(3,2), 'c*');
-% plot(transformMatrix(4,1), transformMatrix(4,2), 'c*');
-% 
-% 
-% plot([centroidMatrix(1:3,1); centroidMatrix(1,1)],[centroidMatrix(1:3,2); centroidMatrix(1,2)],'Color','g','LineWidth',1);
-% plot(centroidMatrix(1,1), centroidMatrix(1,2), 'g*');
-% plot(centroidMatrix(2,1), centroidMatrix(2,2), 'g*');
-% plot(centroidMatrix(3,1), centroidMatrix(3,2), 'g*');
-% plot(centroidMatrix(4,1), centroidMatrix(4,2), 'g*');
-% pause;

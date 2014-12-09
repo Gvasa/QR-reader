@@ -1,6 +1,6 @@
 function[thePoint] = findAlignP(centroidMatrix, img)
 
-disp('Find Aligntment Pattern');
+%disp('Find Aligntment Pattern');
 
 padVolume = 500;
 
@@ -20,16 +20,14 @@ from_X = (pointNE(1)-distance_NW_NE*0.25);
 to_X = pointNE(1)+distance_NW_NE*0.2;
 from_Y = (pointSW(2)-distance_NW_SW*0.25);
 to_Y = pointSW(2)+distance_NW_SW*0.2;
-cropedImg = img(from_Y:to_Y, from_X:to_X);
-% disp('----- Croped Img ----');
-% imshow(cropedImg);
-% pause;
+cropedImg = img(floor(from_Y):floor(to_Y), floor(from_X):floor(to_X));
 
-%                           %
-%                           %    
-% It's time fo find the MF  %
-%                           %
-%                           %
+%                                           %
+%                                           %    
+% It's time fo find the alignment pattern   %
+%                                           %
+%       
+%
 startPos = 0;
 ratio = 0;
 state = 0;
@@ -37,8 +35,8 @@ whiteCounter = 0;
 blackCounter = 0;
 
 % Con. interval
-upperRate = 1.5;
-lowerRate = 0.5;
+upperRate = 1.6;
+lowerRate = 0.4;
 
 coordsX = zeros(100000,4);
 coordsY = zeros(100000,4);
@@ -60,7 +58,7 @@ for i = 1 : rowSize
     while(j<=colSize)
 
         switch state
-            case 0 % Vit
+            case 0 % White
                 if(cropedImg(i,j) == 1)
                     startPos = j;
                     state = 1;
@@ -68,14 +66,14 @@ for i = 1 : rowSize
                     whiteCounter = 0;
                     blackCounter = 0;
                 end
-            case 1 % Vit
+            case 1 % White
                 if(cropedImg(i,j) == 1)
                     ratio = ratio +1;
                 else
                     state = 2;
                     blackCounter = blackCounter +1;
                 end
-            case 2 % Svart
+            case 2 % Black
                 nextPixel = cropedImg(i,j+1);
                 if(cropedImg(i,j) == 0)
                     blackCounter = blackCounter +1;
@@ -87,7 +85,7 @@ for i = 1 : rowSize
                     state = 0;
                     j = startPos;
                 end
-            case 3 % Vit mitten
+            case 3 % White - middle
                 nextPixel = cropedImg(i,j+1);
                 if(cropedImg(i,j) == 1)
                     whiteCounter = whiteCounter +1;
@@ -99,7 +97,7 @@ for i = 1 : rowSize
                     state = 0;
                     j = startPos;
                 end
-            case 4 % Svart
+            case 4 % Black
                 nextPixel = cropedImg(i,j+1);
                 if(cropedImg(i,j) == 0)
                     blackCounter = blackCounter +1;
@@ -111,7 +109,7 @@ for i = 1 : rowSize
                     state = 0;
                     j = startPos;
                 end
-            case 5 % Sista vita
+            case 5 % Last white
                 if(cropedImg(i,j) == 1)
                     whiteCounter = whiteCounter +1;
                     if(whiteCounter >= 0.9*ratio && whiteCounter <= upperRate*ratio)
@@ -145,7 +143,7 @@ i=1;
 for j = 1 : colSize
     while(i<=rowSize)
         switch state
-            case 0 % Vit
+            case 0 % White
                 if(cropedImg(i,j) == 1)
                     startPos = i;
                     state = 1;
@@ -153,14 +151,14 @@ for j = 1 : colSize
                     whiteCounter = 0;
                     blackCounter = 0;
                 end
-            case 1 % Vit
+            case 1 % White
                 if(cropedImg(i,j) == 1)
                     ratio = ratio +1;
                 else
                     state = 2;
                     blackCounter = blackCounter +1;
                 end
-            case 2 % Svart
+            case 2 % Black
                 nextPixel = cropedImg(i+1,j);
                 if(cropedImg(i,j) == 0)
                     blackCounter = blackCounter +1;
@@ -172,7 +170,7 @@ for j = 1 : colSize
                     state = 0;
                     i = startPos;
                 end
-            case 3 % Vit mitten
+            case 3 % White in the middle
                 nextPixel = cropedImg(i+1,j);
                 if(cropedImg(i,j) == 1)
                     whiteCounter = whiteCounter +1;
@@ -184,7 +182,7 @@ for j = 1 : colSize
                     state = 0;
                     i = startPos;
                 end
-            case 4 % Svart
+            case 4 % Black
                 nextPixel = cropedImg(i+1,j);
                 if(cropedImg(i,j) == 0)
                     blackCounter = blackCounter +1;
@@ -196,7 +194,7 @@ for j = 1 : colSize
                     state = 0;
                     i = startPos;
                 end
-            case 5 % Sista vita
+            case 5 % Black
                 if(cropedImg(i,j) == 1)
                     whiteCounter = whiteCounter +1;
                     if(whiteCounter >= 0.9*ratio && whiteCounter <= upperRate*ratio)
@@ -226,21 +224,12 @@ end
 % Crop the matrix
 coordsX = coordsX(1:counterCoordsX,:);
 coordsY = coordsY(1:counterCoordsY,:);
-% -------------------------- PLOT SHIT
-% figure;
-% imshow(cropedImg);
-% hold on;
-% 
-% for i=1:counterCoordsX
-%     plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
-% end
-% 
-% for i=1:counterCoordsY
-%     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
-% end
-% 
-% pause;
 
+%                               %
+%                               %
+% It's time to remove bad lines %
+%                               %
+%                               %
 granne = 5;
 antalgrannar = 5;
 
@@ -250,13 +239,13 @@ antalgrannar = 5;
 
 coordsX = sortrows(coordsX,2);
 
-% Tar bort linjer som inte har n?gra n?ra grannar
+% Flag lines with neighbours far away
 for i = 1:sizeX-1
     if((coordsX(i+1,2) - coordsX(i,2)) > granne)
         coordsX(i,:) = [0, 0, 0 ,0];
     end
 end
-% Flaggar linjer som har grannar men f?
+% Flag lines with few neighbours
 for i = 1:sizeX-1
     if(sum(ismember(coordsX(:,1),coordsX(i,1), 'rows')) < antalgrannar)
         mask = (1-ismember(coordsX(:,1),coordsX(i,1), 'rows'));
@@ -266,14 +255,14 @@ for i = 1:sizeX-1
 end
 
 coordsY = sortrows(coordsY,1);
-% Tar bort linjer som inte har n?gra n?ra grannar
+% Flag lines with neighbours far away
 for i = 1:sizeY-1
     if((coordsY(i+1,1) - coordsY(i,1)) > granne)
         coordsY(i,:) = [0, 0, 0 ,0];
     end
 end
 
-% Flaggar linjer som har grannar men f?
+% Flag lines with few neighbours
 for i = 1:sizeY-1
     if(sum(ismember(coordsY(:,2),coordsY(i,2), 'rows')) < antalgrannar)
         mask = (1-ismember(coordsY(:,2),coordsY(i,2), 'rows'));
@@ -282,7 +271,7 @@ for i = 1:sizeY-1
     end
 end
 
-% Tar bort linjer som ?r flaggade
+% Remove flaged lines
 coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
 coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 
@@ -292,6 +281,7 @@ coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 
 % Index how many times intersect - Remove [Twice]
 for i=1:2
+    % Add an index for times intersecting
     coordsX = [coordsX zeros(sizeX,1)];
     coordsY = [coordsY zeros(sizeY,1)];
 
@@ -304,9 +294,11 @@ for i=1:2
         end
     end
     
-    intervall = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.66);
+    % Check which lines who will be removed
+    interval = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.75);
 
-    for i=1:intervall
+    % Remove bad lines
+    for i=1:interval
         coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
         coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
     end
@@ -314,25 +306,14 @@ for i=1:2
     [sizeX, ~] = size(coordsX);
     [sizeY, ~] = size(coordsY);
 
+    % Remove the index
     coordsX = coordsX(:, 1:4);
     coordsY = coordsY(:, 1:4);
 end
 
+% Remove flaged lines
 coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
 coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
-
-% ------------------------PLOT after removing intersect lines
-% figure
-% imshow(cropedImg);
-% hold on
-% for i=1:sizeX
-%     plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
-% end
-% 
-% for i=1:sizeY
-%     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
-% end
-% pause
 
 % Find our point by our lines
 alignPY = floor(mean(coordsX(:,2)));
@@ -342,8 +323,6 @@ alignPX = floor(mean(coordsY(:,1)));
 iLabel = logical(cropedImg);
 stat = regionprops(iLabel, 'centroid');
 centroids = cat(1,stat.Centroid);
-%plot(centroids(:,1),centroids(:,2), 'b*');
-%pause;
 
 % Find the centridPoint that matches our point best.
 [sizeCentroids ~] = size(centroids);
@@ -359,7 +338,7 @@ for i = 1:sizeCentroids
 end
 
 % Set the point to the orignal coord-system
-thePoint(1,1) = thePoint(1,1)+from_X-padVolume;
-thePoint(1,2) = thePoint(1,2)+from_Y-padVolume;
+thePoint(1,1) = thePoint(1,1)+from_X-padVolume-1;
+thePoint(1,2) = thePoint(1,2)+from_Y-padVolume-1;
 
                 

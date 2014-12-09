@@ -1,23 +1,23 @@
-function[centroidMatrix] = findPoints(img, coordsX, coordsY)
+function[centroidMatrix, antalgrannar] = findPoints(img, coordsX, coordsY, grannar)
 
-disp('Find Points');
 
-granne = 1;
-antalgrannar = 3;
+granne = 3;
+antalgrannar = grannar;
 
-% Finna storleken p? coordsX och Y
+% Find size
 [sizeX ~] = size(coordsX);
 [sizeY ~] = size(coordsY);
 
+% Sort
 coordsX = sortrows(coordsX,2);
 
-% Tar bort linjer som inte har n?gra n?ra grannar
+% Flag lines with neighbours far away
 for i = 1:sizeX-1
     if((coordsX(i+1,2) - coordsX(i,2)) > granne)
         coordsX(i,:) = [0, 0, 0 ,0];
     end
 end
-% Flaggar linjer som har grannar men f?
+% Flag lines with few neighbours
 for i = 1:sizeX-1
     if(sum(ismember(coordsX(:,1),coordsX(i,1), 'rows')) < antalgrannar)
         mask = (1-ismember(coordsX(:,1),coordsX(i,1), 'rows'));
@@ -27,20 +27,15 @@ for i = 1:sizeX-1
 end
 
 coordsY = sortrows(coordsY,1);
-% Tar bort linjer som inte har n?gra n?ra grannar
+
+% Flag lines with neighbours far away
 for i = 1:sizeY-1
     if((coordsY(i+1,1) - coordsY(i,1)) > granne)
         coordsY(i,:) = [0, 0, 0 ,0];
     end
 end
 
-coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
-coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
-
-[sizeX ~] = size(coordsX);
-[sizeY ~] = size(coordsY);
-
-% Flaggar linjer som har grannar men f?
+% Flag lines with few neighbours
 for i = 1:sizeY-1
     if(sum(ismember(coordsY(:,2),  coordsY(i,2)  , 'rows')) < antalgrannar)
         mask = (1-ismember(coordsY(:,2),coordsY(i,2), 'rows'));
@@ -49,12 +44,9 @@ for i = 1:sizeY-1
     end
 end
 
-% Tar bort linjer som ?r flaggade
+% Remove flaged lines
 coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
 coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
-
-[sizeX ~] = size(coordsX);
-[sizeY ~] = size(coordsY);
 
 % Check Size
 [sizeX, ~] = size(coordsX);
@@ -62,21 +54,28 @@ coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 
 % Index how many times intersect - Remove [Twice]
 for i=1:2
+    % Add an index for times intersecting
     coordsX = [coordsX zeros(sizeX,1)];
     coordsY = [coordsY zeros(sizeY,1)];
 
     for x = 1:sizeX
         for y = 1:sizeY
-            if(coordsX(x,2) >= coordsY(y,4) && coordsX(x,2) <= coordsY(y,2) && coordsY(y,1) >= coordsX(x,3) && coordsY(y,1) <= coordsX(x,1))
+            if(coordsX(x,2) >= coordsY(y,4) && ...
+                coordsX(x,2) <= coordsY(y,2) && ...
+                coordsY(y,1) >= coordsX(x,3) && ...
+                coordsY(y,1) <= coordsX(x,1))
+            
                 coordsX(x,5) = coordsX(x,5)+1;
                 coordsY(y,5) = coordsY(y,5)+1;
             end
         end
     end
     
-    intervall = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.8);
+    % Check which lines who will be removed
+    interval = floor(min([max(coordsX(:,5)) max(coordsY(:,5))])*0.75);
 
-    for i=1:intervall
+    % Remove lines
+    for i=1:interval
         coordsX(ismember(coordsX(:,5),i-1, 'rows'), :) = [];
         coordsY(ismember(coordsY(:,5),i-1, 'rows'), :) = [];
     end
@@ -84,26 +83,22 @@ for i=1:2
     [sizeX, ~] = size(coordsX);
     [sizeY, ~] = size(coordsY);
 
+    % Remove the index
     coordsX = coordsX(:, 1:4);
     coordsY = coordsY(:, 1:4);
 end
 
-% figure
-% imshow(img);
-% hold on
-% for i=1:sizeX
-%     plot([coordsX(i,1),coordsX(i,3)],[coordsX(i,2),coordsX(i,4)],'Color','r','LineWidth',1);
-% end
-% 
-% for i=1:sizeY
-%     plot([coordsY(i,1),coordsY(i,3)],[coordsY(i,2),coordsY(i,4)],'Color','r','LineWidth',1);
-% end
-% pause;
-
+% Remove flaged lines
 coordsX(ismember(coordsX,[0 0 0 0], 'rows'), :) = [];
 coordsY(ismember(coordsY,[0 0 0 0], 'rows'), :) = [];
 
-% H?r finner vi mittpunkter! :D
+%                       %
+%                       %
+% Find centrum points   %
+%                       %
+%                       %
+
+% Find centerpoint of the qr code.
 minX = min(coordsX(:,3));
 minY = min(coordsY(:,4));
 maxX = max(coordsX(:,1));
@@ -112,9 +107,7 @@ maxY = max(coordsY(:,2));
 medelX = (maxX - minX)/2 + minX;
 medelY = (maxY - minY)/2 + minY;
 
-% plot(medelX, medelY, 'r+');
-% pause;
-% NW
+% Find centerpoint North West   %
 NWMYx = (coordsX(:,2) < medelY);
 NWMXx = (coordsX(:,1) < medelX);
 NWMx = NWMYx.*NWMXx;
@@ -133,7 +126,7 @@ NWy = coordsY.*NWMy;
 NWy(ismember(NWy,[0 0 0 0], 'rows'), :) = [];
 finalNWY = (mean(NWy(:,1)));
 
-% ---------------------- SW
+% Find centerpoint South West   %
 SWMYx = (coordsX(:,2) > medelY);
 SWMXx = (coordsX(:,1) < medelX);
 SWMx = SWMYx.*SWMXx;
@@ -152,8 +145,7 @@ SWy = coordsY.*SWMy;
 SWy(ismember(SWy,[0 0 0 0], 'rows'), :) = [];
 finalSWY = (mean(SWy(:,1)));
 
-% ------------------------- NE
-
+% Find centerpoint North East   %
 NEMYx = (coordsX(:,2) < medelY);
 NEMXx = (coordsX(:,1) > medelX);
 NEMx = NEMYx.*NEMXx;
@@ -172,13 +164,13 @@ NEy = coordsY.*NEMy;
 NEy(ismember(NEy,[0 0 0 0], 'rows'), :) = [];
 finalNEY = (mean(NEy(:,1)));
 
-%Find points with labeling and centorids
+% Find points with labeling and centorids
 iLabel = logical(img);
 stat = regionprops(iLabel, 'centroid');
 centroids = cat(1,stat.Centroid);
-% plot(centroids(:,1),centroids(:,2), 'r*');
 
-%Para ihop och finn de som ?r lika
+% Match our points with the centroid points. Smallest distance will be our
+% centerpoint insteed.
 [sizeCentroids ~] = size(centroids);
 minDistNW = 10000;
 minDistNE = 10000;
@@ -203,12 +195,3 @@ for i = 1:sizeCentroids
         centroidMatrix(3,2) = centroids(i,2);
     end
 end
-
-% Final ponits
-% figure 
-% imshow(img);
-% hold on
-% plot(centroidMatrix(:,1),centroidMatrix(:,2),'b*');
-% pause;
-
-
